@@ -3,7 +3,7 @@ services:
     db:
         image: harisekhon/hbase
         volumes:
-        - db_data:/hbase_data
-        - ~/data:/json_data
+        - db_data:/hbase-data
+        - ./data:/json-data
 volumes:
     db_data:
