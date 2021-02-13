@@ -1,2 +1,2 @@
-gzip -d -c reviews.json.gz > reviews.json
-gzip -d -c metadata.json.gz > metadata.json
+gzip -d -c ./data/reviews.json.gz > ./data/reviews.json
+gzip -d -c ./data/metadata.json.gz > ./data/metadata.json
