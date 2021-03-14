@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'com.gline9'
+version '0.0.0'
+
+application {
+    mainClassName "com.gline9.csci.hbase.Main"
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.12.2'
+}
