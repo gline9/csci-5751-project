@@ -23,9 +23,80 @@ public class Main
         Configuration configuration = HBaseConfiguration.create();
         try (Connection connection = ConnectionFactory.createConnection(configuration))
         {
-            createTables(connection);
-            putMetadata(connection, args[0]);
+//            createTables(connection);
+//            putMetadata(connection, args[0]);
+            putReviews(connection, args[1]);
         }
+    }
+
+    private static void putReviews(Connection connection, String reviewFileName) throws IOException
+    {
+        ObjectMapper objectMapper = new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        File file = new File(reviewFileName);
+        BufferedReader reader = Files.newBufferedReader(file.toPath());
+
+        Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
+        Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
+        Table overallReviewTable = connection.getTable(TableName.valueOf("overallReviews"));
+
+        int lines = 0;
+        List<Put> reviewPuts = new ArrayList<>();
+        List<Put> metadataPuts = new ArrayList<>();
+        List<Put> overallReivewPuts = new ArrayList<>();
+        while (reader.ready())
+        {
+            lines++;
+            String line = reader.readLine();
+            if (lines <= 100)
+            {
+                continue;
+            }
+            Review review = objectMapper.readValue(line, Review.class);
+            reviewPuts.add(review.toReviewPut());
+            metadataPuts.add(review.toMetadataPut());
+            overallReivewPuts.add(review.toOverallReviewPut());
+
+            if (lines % 1000 == 0)
+            {
+                printReviewProgress(lines);
+            }
+
+            if (reviewPuts.size() >= 10000)
+            {
+                reviewTable.put(reviewPuts);
+                reviewPuts.clear();
+                System.out.println("Processed review batch: Line " + lines);
+            }
+
+            if (metadataPuts.size() >= 10000)
+            {
+                metadataTable.put(metadataPuts);
+                metadataPuts.clear();
+                System.out.println("Processed metadata batch: Line " + lines);
+            }
+
+            if (overallReivewPuts.size() >= 10000)
+            {
+                overallReviewTable.put(overallReivewPuts);
+                overallReivewPuts.clear();
+                System.out.println("Processed overall reviews batch: Line " + lines);
+            }
+        }
+
+        reviewTable.put(reviewPuts);
+        System.out.println("Processed review batch: Line " + lines);
+
+        metadataTable.put(metadataPuts);
+        System.out.println("Processed review batch: Line " + lines);
+
+        overallReviewTable.put(overallReivewPuts);
+        System.out.println("Processed overall reviews batch: Line " + lines);
+    }
+
+    private static void printReviewProgress(int iterations)
+    {
+        printProgress(iterations, 157260920);
     }
 
     private static void putMetadata(Connection connection, String metadataFileName) throws IOException
@@ -82,7 +153,11 @@ public class Main
 
     private static void printMetadataProgress(int iterations)
     {
-        final int totalIterations = 15023059;
+        printProgress(iterations, 15023059);
+    }
+
+    private static void printProgress(int iterations, int totalIterations)
+    {
         double percentDone = iterations / (double)totalIterations;
 
         int barLength = 40;
