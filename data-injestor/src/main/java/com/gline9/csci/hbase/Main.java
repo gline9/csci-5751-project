@@ -14,12 +14,12 @@ public class Main
         Configuration configuration = HBaseConfiguration.create();
         try (Connection connection = ConnectionFactory.createConnection(configuration))
         {
-
+            printAverages(connection);
         }
     }
 
     public static void printAverages(Connection connection) {
-        System.out.println("A");
+        System.out.println("Test");
     }
 
 }
