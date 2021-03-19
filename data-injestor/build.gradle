@@ -15,10 +15,9 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.12.2'
     implementation group: 'org.apache.hbase', name: 'hbase-client', version: '2.4.1'
 }
 
 installDist {
-    destinationDir file("../data/data-injestor")
+    destinationDir file("~/csci-5751-project/data/text-miner")
 }
