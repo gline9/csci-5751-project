@@ -26,12 +26,16 @@ public class Main
 
         Scan scan = new Scan();
 
-        scan.addColumn(Bytes.toBytes("r"), Bytes.toBytes("rating"));
+        byte[] ratingFamily = Bytes.toBytes("r");
+
+        byte[] ratingColumn = Bytes.toBytes("rating");
+
+        scan.addColumn(ratingFamily, ratingColumn);
 
         ResultScanner reviewScan = reviewTable.getScanner(scan);
 
         for (Result result = reviewScan.next(); result != null; result = reviewScan.next()) {
-            System.out.println(result);
+            System.out.println(result.getValue(ratingFamily, ratingColumn));
             break;
         }
 
