@@ -35,7 +35,7 @@ public class Main
         ResultScanner reviewScan = reviewTable.getScanner(scan);
 
         for (Result result = reviewScan.next(); result != null; result = reviewScan.next()) {
-            System.out.println(Bytes.toInt(result.getValue(ratingFamily, ratingColumn)));
+            System.out.println(Bytes.toString(result.getValue(ratingFamily, ratingColumn)));
             break;
         }
 
