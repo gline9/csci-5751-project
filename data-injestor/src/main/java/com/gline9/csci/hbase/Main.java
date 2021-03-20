@@ -17,10 +17,18 @@ public class Main {
         try (Connection connection = ConnectionFactory.createConnection(configuration)) {
             // much specifiy a percent of data to sample
             switch (args[0]) {
-                case "1r" -> printReviewStats(connection);
-                case "1p" -> printPriceStats(connection);
-                case "7" -> writeTopBrandPerCategory(connection);
-                case "8" -> writeReviewSample(connection, Double.parseDouble(args[1]));
+                case "1r":
+                    printReviewStats(connection);
+                    break;
+                case "1p":
+                    printPriceStats(connection);
+                    break;
+                case "7":
+                    writeTopBrandPerCategory(connection);
+                    break;
+                case "8":
+                    writeReviewSample(connection, Double.parseDouble(args[1]));
+                    break;
             }
         }
     }
