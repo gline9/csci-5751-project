@@ -33,20 +33,21 @@ public class Main {
         }
     }
 
-    public static double getReviewAverage(long[] reviews) {
+    public static double[] getReviewAverage(long[] reviews) {
         long total = 0;
 
         for (int i = 0; i < 6; i++) {
             total += reviews[i];
         }
 
-        double average = 0;
+        double[] averages = new double[2];
 
         for (int i = 1; i < 6; i++) {
-            average += (double) i * reviews[i] / total;
+            averages[0] += (double) i * reviews[i] / total;
+            averages[1] += (double) i * reviews[i] / (total - reviews[0]);
         }
 
-        return average;
+        return averages;
     }
 
     public static void printReviewStats(Connection connection) throws IOException {
@@ -65,25 +66,17 @@ public class Main {
 
         ResultScanner reviewScan = reviewTable.getScanner(scan);
 
-        short reviewMin = 6;
-        short reviewMax = -1;
-
         // assuming that reviews can only be 0, 1, 2, 3, 4, 5
         long[] reviews = new long[6];
 
         for (Result result = reviewScan.next(); result != null; result = reviewScan.next()) {
             short tmp = Bytes.toShort(result.getValue(ratingFamily, ratingColumn));
-            if (tmp > reviewMax) {
-                reviewMax = tmp;
-            }
-            if (tmp < reviewMin) {
-                reviewMin = tmp;
-            }
             reviews[tmp] += 1;
         }
 
-        System.out.println("Review information: min: "
-                + reviewMin + " max: " + reviewMax + " avg: " + getReviewAverage(reviews));
+        double[] averages = getReviewAverage(reviews);
+
+        System.out.println("Review information: avg: " + averages[0] + ", avg (no zeroes): " + averages[1]);
 
         for (int i = 0; i < 6; i++) {
             System.out.println("Review count for " + i + ": " + reviews[i]);
@@ -92,19 +85,24 @@ public class Main {
         reviewScan.close();
     }
 
-    public static double getPriceAverage(HashMap<Double, Long> priceMap) {
+    public static double[] getPriceAverage(HashMap<Double, Long> priceMap) {
         long total = 0;
-        double average = 0.0;
+        long totalNoZero = 0;
+        double[] averages = new double[2];
 
-        for (Long count : priceMap.values())  {
-            total += count;
+        for (HashMap.Entry<Double, Long> entry : priceMap.entrySet())  {
+            total += entry.getValue();
+            if (entry.getKey() != 0) {
+                totalNoZero += entry.getKey();
+            }
         }
 
         for (HashMap.Entry<Double, Long> entry : priceMap.entrySet()) {
-            average += entry.getKey() * entry.getValue() / total;
+            averages[1] += entry.getKey() * entry.getValue() / totalNoZero;
+            averages[0] += entry.getKey() * entry.getValue() / total;
         }
 
-        return average;
+        return averages;
     }
 
     public static void printPriceStats(Connection connection) throws IOException {
@@ -127,6 +125,9 @@ public class Main {
         double priceMin = 100.0;
         double priceMax = 0.0;
 
+        // also keep track of nonzero min
+        double priceMinNoZero = 100.0;
+
         HashMap<Double, Long> priceMap = new HashMap<>();
 
         for (Result result = priceScan.next(); result != null; result = priceScan.next()) {
@@ -137,6 +138,9 @@ public class Main {
             if (tmp < priceMin) {
                 priceMin = tmp;
             }
+            if (tmp < priceMinNoZero && tmp != 0.0) {
+                priceMinNoZero = tmp;
+            }
 
             if (priceMap.containsKey(tmp)) {
                 priceMap.put(tmp, priceMap.get(tmp) + 1);
@@ -145,26 +149,35 @@ public class Main {
             }
         }
 
+        double[] averages = getPriceAverage(priceMap);
+
         System.out.println("Price information: min: "
-                + priceMin + " max: " + priceMax + " avg: " + getPriceAverage(priceMap));
+                + priceMin + ", min (no zeroes): " + priceMinNoZero + ", max: " + priceMax +
+                ", avg: " + averages[0] + ", avg (no zeroes): " + averages[1]);
 
         priceScan.close();
-
     }
 
-    public static double getReviewMapAverage(HashMap<Short, Long> reviewMap) {
+    public static double[] getReviewMapAverage(HashMap<Short, Long> reviewMap) {
         long total = 0;
-        double average = 0.0;
+        long totalNoZero = 0;
+        // first average is with zeros, second is without
+        double[] averages = new double[2];
 
-        for (Long count : reviewMap.values())  {
-            total += count;
+        for (HashMap.Entry<Short, Long> entry : reviewMap.entrySet())  {
+            total += entry.getValue();
+            if (entry.getValue() != 0) {
+                totalNoZero += entry.getValue();
+            }
         }
 
         for (HashMap.Entry<Short, Long> entry : reviewMap.entrySet()) {
-            average += ((double) entry.getKey()) * entry.getValue() / total;
+            averages[0] += ((double) entry.getKey()) * entry.getValue() / total;
+            // since the zero values contribute nothing, doesn't matter
+            averages[1] += ((double) entry.getKey()) * entry.getValue() / totalNoZero;
         }
 
-        return average;
+        return averages;
     }
 
     public static void writeTopThree(
@@ -177,34 +190,64 @@ public class Main {
         double[] prices = new double[3];
         String[] brands = new String[3];
 
+        double[] pricesNoZero = new double[3];
+        String[] brandsNoZero = new String[3];
+
         for (HashMap.Entry<String, HashMap<Short, Long>> entry : brandMap.entrySet()) {
-            double average = getReviewMapAverage(entry.getValue());
+            double[] averages = getReviewMapAverage(entry.getValue());
             // lazy hardcoded method, manually swap down the values
-            if (average > prices[0]) {
+            // start with array with zeroes
+            if (averages[0] > prices[0]) {
                 // new largest value
                 prices[2] = prices[1];
                 brands[2] = brands[1];
                 prices[1] = prices[0];
                 brands[1] = brands[0];
-                prices[0] = average;
+                prices[0] = averages[0];
                 brands[0] = entry.getKey();
-            } else if (average > prices[1]) {
+            } else if (averages[0] > prices[1]) {
                 // new second largest
                 prices[2] = prices[1];
                 brands[2] = brands[1];
-                prices[1] = average;
+                prices[1] = averages[0];
                 brands[1] = entry.getKey();
-            } else if (average > prices[2]) {
+            } else if (averages[0] > prices[2]) {
                 // new third largest
-                prices[2] = average;
+                prices[2] = averages[0];
                 brands[2] = entry.getKey();
+            }
+
+            // start with array without zeroes
+            if (averages[1] > pricesNoZero[0]) {
+                // new largest value
+                pricesNoZero[2] = pricesNoZero[1];
+                brandsNoZero[2] = brandsNoZero[1];
+                pricesNoZero[1] = pricesNoZero[0];
+                brandsNoZero[1] = brandsNoZero[0];
+                pricesNoZero[0] = averages[1];
+                brandsNoZero[0] = entry.getKey();
+            } else if (averages[1] > pricesNoZero[1]) {
+                // new second largest
+                pricesNoZero[2] = pricesNoZero[1];
+                brandsNoZero[2] = brandsNoZero[1];
+                pricesNoZero[1] = averages[1];
+                brandsNoZero[1] = entry.getKey();
+            } else if (averages[1] > pricesNoZero[2]) {
+                // new third largest
+                pricesNoZero[2] = averages[1];
+                brandsNoZero[2] = entry.getKey();
             }
         }
 
-        writer.write("Category: " + category + ", Brand/price: "
+        writer.write("Category (with zeroes): " + category + ", Brand/price: "
                 + brands[0] + "/" + prices[0] + ", "
                 + brands[1] + "/" + prices[1] + ", "
                 + brands[2] + "/" + prices[2] + "\n");
+
+        writer.write("Category (without zeroes): " + category + ", Brand/price: "
+                + brandsNoZero[0] + "/" + pricesNoZero[0] + ", "
+                + brandsNoZero[1] + "/" + pricesNoZero[1] + ", "
+                + brandsNoZero[2] + "/" + pricesNoZero[2] + "\n");
     }
 
     public static void writeTopBrandPerCategory(Connection connection) throws IOException {
@@ -297,7 +340,7 @@ public class Main {
             short rating = Bytes.toShort(result.getValue(reviewFamily, ratingColumn));
             String review = Bytes.toString(result.getValue(reviewFamily, reviewColumn));
             double random = Math.random();
-            if (random < percent) {
+            if (random < percent && rating != 0) {
                 if (random < percent * 0.8) {
                     // training data
                     trainWriter.write("__lab__" + rating + " " + review + "\n");
