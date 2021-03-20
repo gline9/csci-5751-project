@@ -7,16 +7,16 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Main
-{
-    public static void main(String[] args) throws IOException
-    {
+public class Main {
+    public static void main(String[] args) throws IOException {
 
         Configuration configuration = HBaseConfiguration.create();
-        try (Connection connection = ConnectionFactory.createConnection(configuration))
-        {
-            printReviewStats(connection);
+        try (Connection connection = ConnectionFactory.createConnection(configuration)) {
+            //printReviewStats(connection);
+            printPriceStats(connection);
         }
     }
 
@@ -37,7 +37,7 @@ public class Main
     }
 
     public static void printReviewStats(Connection connection) throws IOException {
-        // question 1
+        // question 1 (easy) - reviews
         Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
 
         Scan scan = new Scan();
@@ -68,8 +68,70 @@ public class Main
         }
 
         System.out.println("Review information: min: "
-                        + reviewMin + " max: " + reviewMax + " avg: " + getReviewAverage(reviews));
+                + reviewMin + " max: " + reviewMax + " avg: " + getReviewAverage(reviews));
+
+        for (int i = 0; i < 6; i++) {
+            System.out.println("Review count for " + i + ": " + reviews[i]);
+        }
 
         reviewScan.close();
+    }
+
+    public static double getPriceAverage(HashMap<Double, Long> priceMap) {
+        long total = 0;
+        double average = 0.0;
+
+        for (Long count : priceMap.values())  {
+            total += count;
+        }
+
+        for (HashMap.Entry<Double, Long> entry : priceMap.entrySet()) {
+            average += entry.getKey() * entry.getValue() / total;
+        }
+
+        return average;
+    }
+
+    public static void printPriceStats(Connection connection) throws IOException {
+        // question 1 (easy) - price
+        Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
+
+        Scan scan = new Scan();
+
+        byte[] metadataFamily = Bytes.toBytes("m");
+
+        byte[] metadataColumn = Bytes.toBytes("price");
+
+        scan.addColumn(metadataFamily, metadataColumn);
+
+        ResultScanner priceScan = metadataTable.getScanner(scan);
+
+        // assuming minPrice is less than 100.00
+        double priceMin = 100.0;
+        double priceMax = 0.0;
+
+        HashMap<Double, Long> priceMap = new HashMap<>();
+
+        for (Result result = priceScan.next(); result != null; result = priceScan.next()) {
+            double tmp = Bytes.toShort(result.getValue(metadataFamily, metadataColumn));
+            if (tmp > priceMax) {
+                priceMax = tmp;
+            }
+            if (tmp < priceMin) {
+                priceMin = tmp;
+            }
+
+            if (priceMap.containsKey(tmp)) {
+                priceMap.put(tmp, priceMap.get(tmp) + 1);
+            } else {
+                priceMap.put(tmp, 1L);
+            }
+        }
+
+        System.out.println("Price information: min: "
+                + priceMin + " max: " + priceMax + " avg: " + getPriceAverage(priceMap));
+
+        priceScan.close();
+
     }
 }
