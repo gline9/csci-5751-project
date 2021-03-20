@@ -26,7 +26,7 @@ public class Main
 
         Scan scan = new Scan();
 
-        scan.addColumn(Bytes.toBytes("rating"), Bytes.toBytes("r"));
+        scan.addColumn(Bytes.toBytes("r"), Bytes.toBytes("rating"));
 
         ResultScanner reviewScan = reviewTable.getScanner(scan);
 
