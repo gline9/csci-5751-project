@@ -6,17 +6,22 @@ import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
 public class Main {
     public static void main(String[] args) throws IOException {
 
         Configuration configuration = HBaseConfiguration.create();
         try (Connection connection = ConnectionFactory.createConnection(configuration)) {
-            //printReviewStats(connection);
-            //printPriceStats(connection);
+            // much specifiy a percent of data to sample
+            switch (args[0]) {
+                case "1r" -> printReviewStats(connection);
+                case "1p" -> printPriceStats(connection);
+                case "7" -> writeTopBrandPerCategory(connection);
+                case "8" -> writeReviewSample(connection, Double.parseDouble(args[1]));
+            }
         }
     }
 
@@ -38,6 +43,8 @@ public class Main {
 
     public static void printReviewStats(Connection connection) throws IOException {
         // question 1 (easy) - reviews
+        System.out.println("Printing review rating stats.");
+
         Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
 
         Scan scan = new Scan();
@@ -94,6 +101,8 @@ public class Main {
 
     public static void printPriceStats(Connection connection) throws IOException {
         // question 1 (easy) - price
+        System.out.println("Printing price stats.");
+
         Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
 
         Scan scan = new Scan();
@@ -135,8 +144,64 @@ public class Main {
 
     }
 
-    public static void printTopBrandPerCategory(Connection connection) throws IOException {
+    public static double getReviewMapAverage(HashMap<Short, Long> reviewMap) {
+        long total = 0;
+        double average = 0.0;
+
+        for (Long count : reviewMap.values())  {
+            total += count;
+        }
+
+        for (HashMap.Entry<Short, Long> entry : reviewMap.entrySet()) {
+            average += ((double) entry.getKey()) * entry.getValue() / total;
+        }
+
+        return average;
+    }
+
+    public static void writeTopThree(
+            String category,
+            HashMap<String, HashMap<Short, Long>> brandMap,
+            FileWriter writer) throws IOException {
+        // get the top three, per the input category
+
+        // prices organized from high to low
+        double[] prices = new double[3];
+        String[] brands = new String[3];
+
+        for (HashMap.Entry<String, HashMap<Short, Long>> entry : brandMap.entrySet()) {
+            double average = getReviewMapAverage(entry.getValue());
+            // lazy hardcoded method, manually swap down the values
+            if (average > prices[0]) {
+                // new largest value
+                prices[2] = prices[1];
+                brands[2] = brands[1];
+                prices[1] = prices[0];
+                brands[1] = brands[0];
+                prices[0] = average;
+                brands[0] = entry.getKey();
+            } else if (average > prices[1]) {
+                // new second largest
+                prices[2] = prices[1];
+                brands[2] = brands[1];
+                prices[1] = average;
+                brands[1] = entry.getKey();
+            } else if (average > prices[2]) {
+                // new third largest
+                prices[2] = average;
+                brands[2] = entry.getKey();
+            }
+        }
+
+        writer.write("Category: " + category + ", Brand/price: "
+                + brands[0] + "/" + prices[0] + ", "
+                + brands[1] + "/" + prices[1] + ", "
+                + brands[2] + "/" + prices[2] + "\n");
+    }
+
+    public static void writeTopBrandPerCategory(Connection connection) throws IOException {
         // question 3 (medium)
+        System.out.print("Attempting to scan database and retrieve top brands per category.");
         Table brandReviewsTable = connection.getTable(TableName.valueOf("brandReviews"));
 
         Scan scan = new Scan();
@@ -186,8 +251,60 @@ public class Main {
             }
         }
 
+        System.out.println("Finished scan of database, starting aggregation.");
         // loop through the categories, finding the top 3 brands for each
+        // output to file as each calculation is made
+        FileWriter writer = new FileWriter("/json-data/top-brands-per-category.txt");
+        for (HashMap.Entry<String, HashMap<String, HashMap<Short, Long>>> entry : catBrandReviewsMap.entrySet()) {
+            writeTopThree(entry.getKey(), entry.getValue(), writer);
+        }
+        writer.close();
+
+        System.out.println("Finished write of top brands per category to /json-data/top-brands-per-category.txt.");
 
         brandReviewsScan.close();
+    }
+
+    public static void writeReviewSample(Connection connection, double percent) throws IOException {
+        // question 3 (medium), supply a percent to sample a certain percent of the data (approximate)
+        System.out.println("Sampling train and test data for fastText model.");
+        Table reviewsTable = connection.getTable(TableName.valueOf("reviews"));
+
+        Scan scan = new Scan();
+
+        byte[] reviewFamily = Bytes.toBytes("r");
+
+        byte[] reviewColumn = Bytes.toBytes("review");
+
+        byte[] ratingColumn = Bytes.toBytes("rating");
+
+        scan.addColumn(reviewFamily, reviewColumn);
+        scan.addColumn(reviewFamily, ratingColumn);
+
+        ResultScanner reviewScan = reviewsTable.getScanner(scan);
+        FileWriter trainWriter = new FileWriter("/json-data/reviews.train");
+        FileWriter testWriter = new FileWriter("/json-data/reviews.test");
+
+        for (Result result = reviewScan.next(); result != null; result = reviewScan.next()) {
+            short rating = Bytes.toShort(result.getValue(reviewFamily, ratingColumn));
+            String review = Bytes.toString(result.getValue(reviewFamily, reviewColumn));
+            double random = Math.random();
+            if (random < percent) {
+                if (random < percent * 0.8) {
+                    // training data
+                    trainWriter.write("__lab__" + rating + " " + review + "\n");
+                } else {
+                    // testing data
+                    testWriter.write("__lab__" + rating + " " + review + "\n");
+                }
+            }
+        }
+        trainWriter.close();
+        testWriter.close();
+
+        System.out.println("Finished writing fasttext input data.");
+
+        reviewScan.close();
+
     }
 }
