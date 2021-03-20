@@ -16,7 +16,7 @@ public class Main {
         Configuration configuration = HBaseConfiguration.create();
         try (Connection connection = ConnectionFactory.createConnection(configuration)) {
             //printReviewStats(connection);
-            printPriceStats(connection);
+            //printPriceStats(connection);
         }
     }
 
@@ -113,7 +113,7 @@ public class Main {
         HashMap<Double, Long> priceMap = new HashMap<>();
 
         for (Result result = priceScan.next(); result != null; result = priceScan.next()) {
-            double tmp = Bytes.toShort(result.getValue(metadataFamily, metadataColumn));
+            double tmp = Bytes.toDouble(result.getValue(metadataFamily, metadataColumn));
             if (tmp > priceMax) {
                 priceMax = tmp;
             }
@@ -133,5 +133,61 @@ public class Main {
 
         priceScan.close();
 
+    }
+
+    public static void printTopBrandPerCategory(Connection connection) throws IOException {
+        // question 3 (medium)
+        Table brandReviewsTable = connection.getTable(TableName.valueOf("brandReviews"));
+
+        Scan scan = new Scan();
+
+        byte[] brandReviewsFamily = Bytes.toBytes("o");
+
+        byte[] brandReviewsColumn = Bytes.toBytes("overall");
+
+        scan.addColumn(brandReviewsFamily, brandReviewsColumn);
+
+        ResultScanner brandReviewsScan = brandReviewsTable.getScanner(scan);
+
+        // Category hashmap that contains brand hashmap, which contains a rating hashmap
+        HashMap<String, HashMap<String, HashMap<Short, Long>>> catBrandReviewsMap = new HashMap<>();
+
+        // first, get all the review ratings, brands, and categories and add them to the map
+        for (Result result = brandReviewsScan.next(); result != null; result = brandReviewsScan.next()) {
+            short tmp = Bytes.toShort(result.getValue(brandReviewsFamily, brandReviewsColumn));
+
+            String rowKey = Bytes.toString(result.getRow());
+            // should be category-brand
+            String[] splitRowKey = rowKey.split("-");
+            if (catBrandReviewsMap.containsKey(splitRowKey[0])) {
+                HashMap<String, HashMap<Short, Long>> brandReviewsMap = catBrandReviewsMap.get(splitRowKey[0]);
+                if (brandReviewsMap.containsKey(splitRowKey[1])) {
+                    HashMap<Short, Long> reviewsMap = brandReviewsMap.get(splitRowKey[1]);
+                    if (reviewsMap.containsKey(tmp)) {
+                        // we have brand, category, and rating
+                        reviewsMap.put(tmp, reviewsMap.get(tmp) + 1);
+                    } else {
+                        // we have brand, category, but not rating
+                        reviewsMap.put(tmp, 1L);
+                    }
+                } else {
+                    // we have the category, but not the brand or rating
+                    HashMap<Short, Long> reviewsMap = new HashMap<>();
+                    reviewsMap.put(tmp, 1L);
+                    brandReviewsMap.put(splitRowKey[1], reviewsMap);
+                }
+            } else {
+                // we don't have the category or the brand or rating
+                HashMap<Short, Long> reviewsMap = new HashMap<>();
+                reviewsMap.put(tmp, 1L);
+                HashMap<String, HashMap<Short, Long>> brandReviewsMap = new HashMap<>();
+                brandReviewsMap.put(splitRowKey[1], reviewsMap);
+                catBrandReviewsMap.put(splitRowKey[0], brandReviewsMap);
+            }
+        }
+
+        // loop through the categories, finding the top 3 brands for each
+
+        brandReviewsScan.close();
     }
 }
