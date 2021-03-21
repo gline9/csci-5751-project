@@ -258,7 +258,7 @@ public class Main {
     public static void writeTopBrandPerCategory(Connection connection) throws IOException {
         // question 3 (medium)
         System.out.print("Attempting to scan database and retrieve top brands per category.");
-        Table brandReviewsTable = connection.getTable(TableName.valueOf("brandReviews"));
+        Table brandReviewsTable = connection.getTable(TableName.valueOf("categoryReviews"));
 
         Scan scan = new Scan();
 
