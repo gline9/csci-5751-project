@@ -90,10 +90,14 @@ public class Main {
         long totalNoZero = 0;
         double[] averages = new double[2];
 
+        System.out.println("Printing high prices over 100000");
         for (HashMap.Entry<Double, Long> entry : priceMap.entrySet())  {
             total += entry.getValue();
             if (entry.getKey() != 0) {
                 totalNoZero += entry.getValue();
+            }
+            if (entry.getKey() > 100000) {
+                System.out.println(entry.getKey());
             }
         }
 
@@ -117,11 +121,7 @@ public class Main {
 
         byte[] metadataColumn = Bytes.toBytes("price");
 
-        byte[] titleColumn = Bytes.toBytes("title");
-
         scan.addColumn(metadataFamily, metadataColumn);
-
-        scan.addColumn(metadataFamily, titleColumn);
 
         ResultScanner priceScan = metadataTable.getScanner(scan);
 
@@ -137,10 +137,6 @@ public class Main {
         for (Result result = priceScan.next(); result != null; result = priceScan.next()) {
             double tmp = Bytes.toDouble(result.getValue(metadataFamily, metadataColumn));
 
-            if (tmp > 1000000) {
-                String title = Bytes.toString(result.getValue(metadataFamily, titleColumn));
-                System.out.println("Item value > 1000000: " + title + ", " + tmp);
-            }
             if (tmp > priceMax) {
                 priceMax = tmp;
             }
