@@ -123,7 +123,6 @@ public class Main {
 
         scan.addColumn(metadataFamily, titleColumn);
 
-
         ResultScanner priceScan = metadataTable.getScanner(scan);
 
         // assuming minPrice is less than 100.00
@@ -139,7 +138,7 @@ public class Main {
             double tmp = Bytes.toDouble(result.getValue(metadataFamily, metadataColumn));
 
             if (tmp > 1000000) {
-                String title = Bytes.toString(result.getValue(metadataFamily, metadataColumn));
+                String title = Bytes.toString(result.getValue(metadataFamily, titleColumn));
                 System.out.println("Item value > 1000000: " + title + ", " + tmp);
             }
             if (tmp > priceMax) {
