@@ -348,10 +348,10 @@ public class Main {
             if (random < percent && rating != 0) {
                 if (random < percent * 0.8) {
                     // training data
-                    trainWriter.write("__lab__" + rating + " " + review + "\n");
+                    trainWriter.write("__label__" + rating + " " + review + "\n");
                 } else {
                     // testing data
-                    testWriter.write("__lab__" + rating + " " + review + "\n");
+                    testWriter.write("__label__" + rating + " " + review + "\n");
                 }
             }
         }
