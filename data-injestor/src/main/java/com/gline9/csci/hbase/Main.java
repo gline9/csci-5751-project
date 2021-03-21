@@ -93,7 +93,11 @@ public class Main {
         for (HashMap.Entry<Double, Long> entry : priceMap.entrySet())  {
             total += entry.getValue();
             if (entry.getKey() != 0) {
-                totalNoZero += entry.getKey();
+                totalNoZero += entry.getValue();
+            }
+            if (entry.getKey() > 2000) {
+                // look at high prices
+                System.out.println(entry.getKey());
             }
         }
 
