@@ -141,15 +141,21 @@ public class Main {
 
         ResultScanner reviewScanner = reviewTable.getScanner(reviewScan);
         ResultScanner metadataScanner = metadataTable.getScanner(reviewScan);
-
+        int check = 0;
+        for(Result priceResult: metadataScanner){
+            String metadataKey = Bytes.toString(priceResult.getRow());
+            double price = Bytes.toDouble(priceResult.getValue(metadataFamily,priceColumn));
+            System.out.println("MetadataKey - " + metadataKey + "Price - " + price);
+            if(++check == 3){
+                break;
+            }
+        }
         for(Result reviewResult : reviewScanner){
             String reviewKey = Bytes.toString(reviewResult.getRow());
             short rating = Bytes.toShort(reviewResult.getValue(ratingFamily,ratingColumn));
-            for(Result priceResult: metadataScanner){
-                String metadataKey = Bytes.toString(priceResult.getRow());
-                double price = Bytes.toDouble(priceResult.getValue(metadataFamily,priceColumn));
-                System.out.println("ReviewKEY - " + reviewKey + "VALUE - " + rating + "MetadataKey - " + metadataKey + "Price - " + price);
-
+            System.out.println("ReviewKEY - " + reviewKey + "VALUE - " + rating);
+            if(++check == 6){
+                break;
             }
         }
 
