@@ -146,7 +146,7 @@ public class Main {
             String reviewKey = Bytes.toString(reviewResult.getRow());
             short rating = Bytes.toShort(reviewResult.getValue(ratingFamily,ratingColumn));
             for(Result priceResult: metadataScanner){
-                String metadataKey = Bytes.toString(reviewResult.getRow());
+                String metadataKey = Bytes.toString(priceResult.getRow());
                 double price = Bytes.toDouble(priceResult.getValue(metadataFamily,priceColumn));
                 System.out.println("ReviewKEY - " + reviewKey + "VALUE - " + rating + "MetadataKey - " + metadataKey + "Price - " + price);
 
