@@ -26,7 +26,7 @@ public class Main {
     }
     public static void countNullValues(Connection connection) throws IOException{
         Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
-        Table metadataTable = connection.getTable(TableName.valueOf("metadata"))
+        Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
         Scan ratingScanner = new Scan();
         Scan reviewScanner = new Scan();
         Scan reviewerIDScanner = new Scan();
@@ -43,7 +43,7 @@ public class Main {
         byte[] reviewerIDColumn = Bytes.toBytes("reviewerID");
 
         //Metadata dataset metadata column family and columns
-        byte[] metadataFamily = Bytes.toBytes("m")
+        byte[] metadataFamily = Bytes.toBytes("m");
         byte[] titleColumn = Bytes.toBytes("title");
         byte[] priceColumn = Bytes.toBytes("price");
         byte[] brandColumn = Bytes.toBytes("brand");
