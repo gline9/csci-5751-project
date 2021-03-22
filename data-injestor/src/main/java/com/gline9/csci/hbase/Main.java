@@ -1,6 +1,8 @@
 package com.gline9.csci.hbase;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.TableName;
@@ -265,56 +267,47 @@ public class Main {
 
         byte[] brandReviewsFamily = Bytes.toBytes("o");
 
-        byte[] brandReviewsColumn = Bytes.toBytes("overall");
-
-        scan.addColumn(brandReviewsFamily, brandReviewsColumn);
+        scan.addFamily(brandReviewsFamily);
 
         ResultScanner brandReviewsScan = brandReviewsTable.getScanner(scan);
 
         // Category hashmap that contains brand hashmap, which contains a rating hashmap
         HashMap<String, HashMap<String, HashMap<Short, Long>>> catBrandReviewsMap = new HashMap<>();
 
-        int iter = 0;
         // first, get all the review ratings, brands, and categories and add them to the map
         for (Result result = brandReviewsScan.next(); result != null; result = brandReviewsScan.next()) {
-            if (iter > 100) {
-                break;
-            }
-            iter += 1;
-            System.out.println("iter " + iter);
-
-            short tmp = Bytes.toShort(result.getValue(brandReviewsFamily, brandReviewsColumn));
             String rowKey = Bytes.toString(result.getRow());
             // should be category-brand
             String[] splitRowKey = rowKey.split("-");
-            if (catBrandReviewsMap.containsKey(splitRowKey[0])) {
-                HashMap<String, HashMap<Short, Long>> brandReviewsMap = catBrandReviewsMap.get(splitRowKey[0]);
-                if (brandReviewsMap.containsKey(splitRowKey[1])) {
-                    HashMap<Short, Long> reviewsMap = brandReviewsMap.get(splitRowKey[1]);
-                    if (reviewsMap.containsKey(tmp)) {
-                        // we have brand, category, and rating
-                        reviewsMap.put(tmp, reviewsMap.get(tmp) + 1);
+            // it would probably be more efficient to have this loop closer to the put
+            for (Cell cell : result.rawCells()) {
+                short tmp = Bytes.toShort(CellUtil.cloneValue(cell));
+                if (catBrandReviewsMap.containsKey(splitRowKey[0])) {
+                    HashMap<String, HashMap<Short, Long>> brandReviewsMap = catBrandReviewsMap.get(splitRowKey[0]);
+                    if (brandReviewsMap.containsKey(splitRowKey[1])) {
+                        HashMap<Short, Long> reviewsMap = brandReviewsMap.get(splitRowKey[1]);
+                        if (reviewsMap.containsKey(tmp)) {
+                            // we have brand, category, and rating
+                            reviewsMap.put(tmp, reviewsMap.get(tmp) + 1);
+                        } else {
+                            // we have brand, category, but not rating
+                            reviewsMap.put(tmp, 1L);
+                        }
                     } else {
-                        // we have brand, category, but not rating
+                        // we have the category, but not the brand or rating
+                        HashMap<Short, Long> reviewsMap = new HashMap<>();
                         reviewsMap.put(tmp, 1L);
+                        brandReviewsMap.put(splitRowKey[1], reviewsMap);
                     }
                 } else {
-                    // we have the category, but not the brand or rating
+                    // we don't have the category or the brand or rating
                     HashMap<Short, Long> reviewsMap = new HashMap<>();
                     reviewsMap.put(tmp, 1L);
+                    HashMap<String, HashMap<Short, Long>> brandReviewsMap = new HashMap<>();
                     brandReviewsMap.put(splitRowKey[1], reviewsMap);
+                    catBrandReviewsMap.put(splitRowKey[0], brandReviewsMap);
                 }
-            } else {
-                // we don't have the category or the brand or rating
-                HashMap<Short, Long> reviewsMap = new HashMap<>();
-                reviewsMap.put(tmp, 1L);
-                HashMap<String, HashMap<Short, Long>> brandReviewsMap = new HashMap<>();
-                brandReviewsMap.put(splitRowKey[1], reviewsMap);
-                catBrandReviewsMap.put(splitRowKey[0], brandReviewsMap);
             }
-
-            System.out.println(splitRowKey[0] + " " + splitRowKey[1] + " " + tmp + " "
-                    + catBrandReviewsMap.get(splitRowKey[0]).get(splitRowKey[1]).get(tmp));
         }
 
         System.out.println("Finished scan of database, starting aggregation.");
