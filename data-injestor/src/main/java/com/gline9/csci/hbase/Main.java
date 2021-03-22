@@ -195,6 +195,7 @@ public class Main {
         // get the top three, per the input category
 
         // prices organized from high to low
+        // TYPO: all these "prices" objects should actually be "ratings" objects
         double[] prices = new double[3];
         String[] brands = new String[3];
 
@@ -247,12 +248,12 @@ public class Main {
             }
         }
 
-        writer.write("Category (with zeroes): " + category + ", Brand/price: "
+        writer.write("Category (with zeroes): " + category + ", Brand/rating: "
                 + brands[0] + "/" + prices[0] + ", "
                 + brands[1] + "/" + prices[1] + ", "
                 + brands[2] + "/" + prices[2] + "\n");
 
-        writer.write("Category (without zeroes): " + category + ", Brand/price: "
+        writer.write("Category (without zeroes): " + category + ", Brand/rating: "
                 + brandsNoZero[0] + "/" + pricesNoZero[0] + ", "
                 + brandsNoZero[1] + "/" + pricesNoZero[1] + ", "
                 + brandsNoZero[2] + "/" + pricesNoZero[2] + "\n");
