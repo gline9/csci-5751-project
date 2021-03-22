@@ -142,7 +142,7 @@ public class Main {
         ResultScanner reviewScanner = reviewTable.getScanner(reviewScan);
         ResultScanner metadataScanner = metadataTable.getScanner(reviewScan);
         int check = 0;
-        for(Result result = metadataScanner.next(); result != null; result = reviewScanner.next()){
+        for(Result result = metadataScanner.next(); result != null; result = metadataScanner.next()){
             String metadataKey = Bytes.toString(result.getRow());
             double price = Bytes.toDouble(result.getValue(metadataFamily,priceColumn));
             System.out.println("MetadataKey - " + metadataKey + "Price - " + price);
