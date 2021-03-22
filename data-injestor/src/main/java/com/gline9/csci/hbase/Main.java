@@ -134,6 +134,7 @@ public class Main {
 
         Scan reviewScan = new Scan();
         Scan metadataScan = new Scan();
+
         byte[] ratingFamily = Bytes.toBytes("r");
         byte[] ratingColumn = Bytes.toBytes("rating");
         byte[] metadataFamily = Bytes.toBytes("m");
@@ -144,7 +145,7 @@ public class Main {
 
 
         int check = 0;
-        for(Result result : metadataScanner){
+        for(Result result = metadataScanner.next(); result != null; result = metadataScanner.next()){
             String metadataKey = Bytes.toString(result.getRow());
             double price = Bytes.toDouble(result.getValue(metadataFamily,priceColumn));
             System.out.println("MetadataKey - " + metadataKey + "Price - " + price);
@@ -152,7 +153,7 @@ public class Main {
                 break;
             }
         }
-        for(Result result : reviewScanner){
+        for(Result result = reviewScanner.next(); result != null; result = reviewScanner.next()){
             String reviewKey = Bytes.toString(result.getRow());
             short rating = Bytes.toShort(result.getValue(ratingFamily,ratingColumn));
             System.out.println("ReviewKEY - " + reviewKey + "VALUE - " + rating);
