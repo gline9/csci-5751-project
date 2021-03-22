@@ -20,7 +20,6 @@ public class Main {
 
         Configuration configuration = HBaseConfiguration.create();
         try (Connection connection = ConnectionFactory.createConnection(configuration)) {
-//            printReviewStats(connection);
             countNullValues(connection);
         }
     }
@@ -60,9 +59,9 @@ public class Main {
         ResultScanner reviewScan = reviewTable.getScanner(reviewScanner);
         ResultScanner reviewerIDScan = reviewTable.getScanner(reviewerIDScanner);
         ResultScanner summaryScan = reviewTable.getScanner(summaryScanner);
-        ResultScanner titleScan = reviewTable.getScanner(titleScanner);
-        ResultScanner priceScan = reviewTable.getScanner(priceScanner);
-        ResultScanner brandScan = reviewTable.getScanner(brandScanner);
+        ResultScanner titleScan = metadataTable.getScanner(titleScanner);
+        ResultScanner priceScan = metadataTable.getScanner(priceScanner);
+        ResultScanner brandScan = metadataTable.getScanner(brandScanner);
 
         int nullReviewCount = 0;
         int nullRatingCount = 0;
@@ -83,7 +82,53 @@ public class Main {
         }
         System.out.println(nullReviewCount);
 
+        for (Result result = ratingScan.next(); result != null; result = ratingScan.next()) {
+            short rating = Bytes.toShort(result.getValue(ratingFamily, ratingColumn));
+            if(rating == 0) {
+                nullRatingCount += 1;
+            }
+        }
 
+        System.out.println(nullRatingCount);
+        for (Result result = reviewerIDScan.next(); result != null; result = reviewerIDScan.next()) {
+            String reviewerID = Bytes.toString(result.getValue(ratingFamily, reviewerIDColumn));
+            if(reviewerID == "") {
+                nullReviewerIDCount += 1;
+            }
+        }
+        System.out.println(nullReviewerIDCount);
+
+        for (Result result = titleScan.next(); result != null; result = titleScan.next()) {
+            String title = Bytes.toString(result.getValue(metadataFamily, titleColumn));
+            if(title == "") {
+                nullTitleCount += 1;
+            }
+        }
+        System.out.println(nullTitleCount);
+
+        for (Result result = priceScan.next(); result != null; result = priceScan.next()) {
+            double price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
+            if(price == 0) {
+                nullPriceCount += 1;
+            }
+        }
+        System.out.println(nullPriceCount);
+
+        for (Result result = brandScan.next(); result != null; result = brandScan.next()) {
+            String brand = Bytes.toString(result.getValue(metadataFamily, brandColumn));
+            if(brand == "") {
+                nullBrandCount += 1;
+            }
+        }
+        System.out.println(nullBrandCount);
+
+        for (Result result = summaryScan.next(); result != null; result = summaryScan.next()) {
+            String summary = Bytes.toString(result.getValue(metadataFamily, summaryColumn));
+            if(summary == "") {
+                nullSummaryCount += 1;
+            }
+        }
+        System.out.println(nullSummaryCount);
     }
 
 }
