@@ -65,7 +65,7 @@ public class Main {
         ResultScanner brandScan = reviewTable.getScanner(brandScanner);
 
         for (Result result = reviewScan.next(); result != null; result = reviewScan.next()) {
-            System.out.println(Result)
+            System.out.println(result);
         }
 
 
