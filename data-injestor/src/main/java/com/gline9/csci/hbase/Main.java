@@ -281,6 +281,7 @@ public class Main {
                 break;
             }
             iter += 1;
+            System.out.println("iter " + iter);
 
             short tmp = Bytes.toShort(result.getValue(brandReviewsFamily, brandReviewsColumn));
             String rowKey = Bytes.toString(result.getRow());
