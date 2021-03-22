@@ -142,7 +142,8 @@ public class Main {
         ResultScanner ratingScan = reviewTable.getScanner(ratingScanner);
         for (Result result = ratingScan.next(); result != null; result = ratingScan.next()) {
             short rating = Bytes.toShort(result.getValue(ratingFamily, ratingColumn));
-            System.out.println(result.getRow());
+            System.out.println("Result: " + result);
+            System.out.println("Rating - " + rating);
         }
     }
 
