@@ -258,7 +258,7 @@ public class Main {
 
     public static void writeTopBrandPerCategory(Connection connection) throws IOException {
         // question 3 (medium)
-        System.out.print("Attempting to scan database and retrieve top brands per category.");
+        System.out.println("Attempting to scan database and retrieve top brands per category.");
         Table brandReviewsTable = connection.getTable(TableName.valueOf("categoryReviews"));
 
         Scan scan = new Scan();
@@ -274,10 +274,15 @@ public class Main {
         // Category hashmap that contains brand hashmap, which contains a rating hashmap
         HashMap<String, HashMap<String, HashMap<Short, Long>>> catBrandReviewsMap = new HashMap<>();
 
+        int iter = 0;
         // first, get all the review ratings, brands, and categories and add them to the map
         for (Result result = brandReviewsScan.next(); result != null; result = brandReviewsScan.next()) {
-            short tmp = Bytes.toShort(result.getValue(brandReviewsFamily, brandReviewsColumn));
+            if (iter > 100) {
+                break;
+            }
+            iter += 1;
 
+            short tmp = Bytes.toShort(result.getValue(brandReviewsFamily, brandReviewsColumn));
             String rowKey = Bytes.toString(result.getRow());
             // should be category-brand
             String[] splitRowKey = rowKey.split("-");
@@ -306,6 +311,9 @@ public class Main {
                 brandReviewsMap.put(splitRowKey[1], reviewsMap);
                 catBrandReviewsMap.put(splitRowKey[0], brandReviewsMap);
             }
+
+            System.out.println(splitRowKey[0] + " " + splitRowKey[1] + " " + tmp + " "
+                    + catBrandReviewsMap.get(splitRowKey[0]).get(splitRowKey[1]).get(tmp));
         }
 
         System.out.println("Finished scan of database, starting aggregation.");
