@@ -130,14 +130,21 @@ public class Main {
 
     public static void findRelationship(Connection connection) throws IOException{
         Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
+        Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
+
         Scan reviewScan = new Scan();
         byte[] ratingFamily = Bytes.toBytes("r");
         byte[] ratingColumn = Bytes.toBytes("rating");
+        byte[] metadataFamily = Bytes.toBytes("m");
+        byte[] priceColumn = Bytes.toBytes("price");
+
         ResultScanner reviewScanner = reviewTable.getScanner(reviewScan);
+
         for(Result result : reviewScanner){
             String key = Bytes.toString(result.getRow());
-            String value = Bytes.toString(result.getValue(ratingFamily,ratingColumn));
-            System.out.println("KEY - " + key + "VALUE - " + value);
+            short rating = Bytes.toShort(result.getValue(ratingFamily,ratingColumn));
+            double price = Bytes.toDouble(result.getValue(metadataFamily,priceColumn));
+            System.out.println("KEY - " + key + "VALUE - " + rating + "Price - " + price);
         }
 
     }
