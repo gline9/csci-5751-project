@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -77,7 +78,7 @@ public class Main {
 
         for (Result result = reviewScan.next(); result != null; result = reviewScan.next()) {
             String review = Bytes.toString(result.getValue(ratingFamily, reviewColumn));
-            if (review == "") {
+            if (review.equals("")) {
                 nullReviewCount += 1;
             }
         }
@@ -93,7 +94,7 @@ public class Main {
         System.out.println(nullRatingCount); //3
         for (Result result = reviewerIDScan.next(); result != null; result = reviewerIDScan.next()) {
             String reviewerID = Bytes.toString(result.getValue(ratingFamily, reviewerIDColumn));
-            if (reviewerID == "") {
+            if (reviewerID.equals("")) {
                 nullReviewerIDCount += 1;
             }
         }
@@ -101,7 +102,7 @@ public class Main {
 
         for (Result result = titleScan.next(); result != null; result = titleScan.next()) {
             String title = Bytes.toString(result.getValue(metadataFamily, titleColumn));
-            if (title == "") {
+            if (title.equals("")) {
                 nullTitleCount += 1;
             }
         }
@@ -117,7 +118,7 @@ public class Main {
 
         for (Result result = brandScan.next(); result != null; result = brandScan.next()) {
             String brand = Bytes.toString(result.getValue(metadataFamily, brandColumn));
-            if (brand == "") {
+            if (brand.equals("")) {
                 nullBrandCount += 1;
             }
         }
@@ -125,7 +126,7 @@ public class Main {
 
         for (Result result = summaryScan.next(); result != null; result = summaryScan.next()) {
             String summary = Bytes.toString(result.getValue(metadataFamily, summaryColumn));
-            if (summary == "") {
+            if (summary.equals("")) {
                 nullSummaryCount += 1;
             }
         }
@@ -140,8 +141,9 @@ public class Main {
         byte[] ratingColumn = Bytes.toBytes("rating");
         ResultScanner ratingScan = reviewTable.getScanner(ratingScanner);
         for (Result result = ratingScan.next(); result != null; result = ratingScan.next()) {
-            System.out.println(result);
-        }
+            short rating = Bytes.toShort(result.getValue(ratingFamily, ratingColumn));
+            System.out.println(result.getRow());
+
     }
 
     public static void findRelationship(Connection connection) throws IOException {
