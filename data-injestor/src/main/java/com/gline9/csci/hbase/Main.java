@@ -140,7 +140,7 @@ public class Main {
         byte[] priceColumn = Bytes.toBytes("price");
 
         ResultScanner reviewScanner = reviewTable.getScanner(reviewScan);
-        ResultScanner metadataScanner = metadataTable.getScanner(reviewScan);
+        ResultScanner metadataScanner = metadataTable.getScanner(metadataScan);
         int check = 0;
         for(Result result = metadataScanner.next(); result != null; result = metadataScanner.next()){
             String metadataKey = Bytes.toString(result.getRow());
