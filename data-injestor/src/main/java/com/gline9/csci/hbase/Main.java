@@ -159,6 +159,8 @@ public class Main {
         for(Result result = reviewScanner.next(); result != null; result = reviewScanner.next()){
             String reviewKey = Bytes.toString(result.getRow());
             short rating = Bytes.toShort(result.getValue(ratingFamily,ratingColumn));
+            String[] tmp = reviewKey.split("-",2);
+            reviewKey = tmp[0];
             System.out.println("ReviewKEY - " + reviewKey + "VALUE - " + rating);
             if(++check == 6){
                 break;
