@@ -321,6 +321,11 @@ public class Main {
         brandReviewsScan.close();
     }
 
+    public static String cleanReview(String line) {
+        // match html chunks or symbols, and condense multiple lines
+        return line.replaceAll("<.+?>|[^a-zA-Z\\d]", " ").toLowerCase();
+    }
+
     public static void writeReviewSample(Connection connection, double percent) throws IOException {
         // question 3 (medium), supply a percent to sample a certain percent of the data (approximate)
         System.out.println("Sampling train and test data for fastText model.");
@@ -343,7 +348,7 @@ public class Main {
 
         for (Result result = reviewScan.next(); result != null; result = reviewScan.next()) {
             short rating = Bytes.toShort(result.getValue(reviewFamily, ratingColumn));
-            String review = Bytes.toString(result.getValue(reviewFamily, reviewColumn));
+            String review = cleanReview(Bytes.toString(result.getValue(reviewFamily, reviewColumn)));
             double random = Math.random();
             if (random < percent && rating != 0) {
                 if (random < percent * 0.8) {
