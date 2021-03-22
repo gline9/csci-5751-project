@@ -21,9 +21,9 @@ public class Main {
 
         Configuration configuration = HBaseConfiguration.create();
         try (Connection connection = ConnectionFactory.createConnection(configuration)) {
-            //countNullValues(connection);
+            countNullValues(connection);
             //findCorrelation(connection);
-            findRelationship(connection);
+            //findRelationship(connection);
         }
     }
 
