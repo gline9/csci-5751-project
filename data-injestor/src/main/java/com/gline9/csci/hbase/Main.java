@@ -234,39 +234,39 @@ public class Main {
         ResultScanner metadataScanner = metadataTable.getScanner(metadataScan);
         for (Result result : reviewScanner) {
             if(Bytes.toShort(result.getValue(ratingFamily, ratingColumn)) == 0){
-                System.out.println("Null rating count incremented.");
+                //System.out.println("Null rating count incremented.");
                 nullRatingCount += 1;
             }
             if(Bytes.toString(result.getValue(ratingFamily, reviewColumn)) == null){
                 nullReviewCount += 1;
-                System.out.println("Null review count incremented.");
+                //System.out.println("Null review count incremented.");
 
             }
             if(Bytes.toString(result.getValue(ratingFamily, reviewerIDColumn)) == null){
                 nullReviewerIDCount += 1;
-                System.out.println("Null reviewerID count incremented.");
+                //System.out.println("Null reviewerID count incremented.");
 
             }
             if(Bytes.toString(result.getValue(ratingFamily, summaryColumn)) == null){
                 nullSummaryCount += 1;
-                System.out.println("Null summary count incremented.");
+                //System.out.println("Null summary count incremented.");
 
             }
         }
         for(Result result : metadataScanner){
             if(Bytes.toString(result.getValue(metadataFamily, titleColumn)) == null){
                 nullTitleCount += 1;
-                System.out.println("Null title count incremented.");
+                //System.out.println("Null title count incremented.");
 
             }
             if(Bytes.toDouble(result.getValue(metadataFamily, priceColumn)) == 0){
                 nullPriceCount += 1;
-                System.out.println("Null price count incremented.");
+                //System.out.println("Null price count incremented.");
 
             }
             if(Bytes.toString(result.getValue(metadataFamily, brandColumn)) == null){
                 nullBrandCount += 1;
-                System.out.println("Null brand count incremented.");
+                //System.out.println("Null brand count incremented.");
 
             }
         }
