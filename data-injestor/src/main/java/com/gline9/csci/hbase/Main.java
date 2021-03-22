@@ -151,7 +151,7 @@ public class Main {
         for(Result result = metadataScanner.next(); result != null; result = metadataScanner.next()){
             String metadataKey = Bytes.toString(result.getRow());
             double price = Bytes.toDouble(result.getValue(metadataFamily,priceColumn));
-            System.out.println("MetadataKey - " + metadataKey + "Price - " + price);
+            System.out.println("MetadataKey - " + metadataKey + "\nPrice - " + price);
             if(++check == 3){
                 break;
             }
@@ -161,7 +161,7 @@ public class Main {
             short rating = Bytes.toShort(result.getValue(ratingFamily,ratingColumn));
             String[] tmp = reviewKey.split("-",2);
             reviewKey = tmp[0];
-            System.out.println("ReviewKEY - " + reviewKey + "VALUE - " + rating);
+            System.out.println("ReviewKEY - " + reviewKey + "\nVALUE - " + rating);
             if(++check == 6){
                 break;
             }
