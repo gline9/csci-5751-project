@@ -64,11 +64,24 @@ public class Main {
         ResultScanner priceScan = reviewTable.getScanner(priceScanner);
         ResultScanner brandScan = reviewTable.getScanner(brandScanner);
 
+        int nullReviewCount = 0;
+        int nullRatingCount = 0;
+        int nullReviewerIDCount = 0;
+        int nullSummaryCount = 0;
+        int nullTitleCount = 0;
+        int nullPriceCount = 0;
+        int nullBrandCount = 0;
+
+
+
+
         for (Result result = reviewScan.next(); result != null; result = reviewScan.next()) {
             String review = Bytes.toString(result.getValue(ratingFamily, reviewColumn));
-            System.out.println(review);
+            if(review == "") {
+                nullReviewCount += 1;
+            }
         }
-
+        System.out.println(nullReviewCount);
 
 
     }
