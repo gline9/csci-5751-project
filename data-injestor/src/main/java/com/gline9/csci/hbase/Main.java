@@ -143,10 +143,10 @@ public class Main {
         for (Result result = ratingScan.next(); result != null; result = ratingScan.next()) {
             short rating = Bytes.toShort(result.getValue(ratingFamily, ratingColumn));
             System.out.println(result.getRow());
-
+        }
     }
 
-    public static void findRelationship(Connection connection) throws IOException {
+    public static void findRelationship(Connection connection) throws IOException{
 
     }
 }
