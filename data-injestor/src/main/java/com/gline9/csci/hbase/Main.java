@@ -9,6 +9,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -322,7 +323,9 @@ public class Main {
     }
 
     public static String cleanReview(String line) {
-        // match html chunks or symbols, and condense multiple lines
+        if (line == null) {
+            return "";
+        }
         return line.replaceAll("<.+?>|[^a-zA-Z\\d]", " ").toLowerCase();
     }
 
@@ -350,7 +353,7 @@ public class Main {
             short rating = Bytes.toShort(result.getValue(reviewFamily, ratingColumn));
             String review = cleanReview(Bytes.toString(result.getValue(reviewFamily, reviewColumn)));
             double random = Math.random();
-            if (random < percent && rating != 0) {
+            if (random < percent && rating != 0 && !review.equals("")) {
                 if (random < percent * 0.8) {
                     // training data
                     trainWriter.write("__label__" + rating + " " + review + "\n");
