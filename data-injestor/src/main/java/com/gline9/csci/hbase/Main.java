@@ -21,9 +21,9 @@ public class Main {
 
         Configuration configuration = HBaseConfiguration.create();
         try (Connection connection = ConnectionFactory.createConnection(configuration)) {
-            countNullValues(connection);
+            //countNullValues(connection);
             //findCorrelation(connection);
-            //findRelationship(connection);
+            findRelationship(connection);
         }
     }
 
@@ -78,9 +78,6 @@ public class Main {
 
         for (Result result = reviewScan.next(); result != null; result = reviewScan.next()) {
             String review = Bytes.toString(result.getValue(ratingFamily, reviewColumn));
-            short rating = Bytes.toShort(result.getValue(ratingFamily, ratingColumn));
-            System.out.println("Review : " + review);
-            System.out.println("Rating : " + rating);
             if (review.equals("")) {
                 nullReviewCount += 1;
             }
@@ -151,6 +148,31 @@ public class Main {
     }
 
     public static void findRelationship(Connection connection) throws IOException{
+        Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
+        Scan scan = new Scan();
+        //Review Dataset review column family and columns
+        byte[] ratingFamily = Bytes.toBytes("r");
+        byte[] ratingColumn = Bytes.toBytes("rating");
+        byte[] reviewColumn = Bytes.toBytes("review");
+
+        //Metadata dataset metadata column family and columns
+        byte[] metadataFamily = Bytes.toBytes("m");
+        byte[] titleColumn = Bytes.toBytes("title");
+        byte[] priceColumn = Bytes.toBytes("price");
+        byte[] brandColumn = Bytes.toBytes("brand");
+
+        scan.addColumn(ratingFamily,ratingColumn);
+        scan.addColumn(ratingFamily,reviewColumn);
+
+        ResultScanner scanner = reviewTable.getScanner(scan);
+
+        for (Result result = scanner.next(); result != null; result = scanner.next()) {
+            String review = Bytes.toString(result.getValue(ratingFamily, reviewColumn));
+            short rating = Bytes.toShort(result.getValue(ratingFamily, ratingColumn));
+            System.out.println(("Review - " + review));
+            System.out.println(("Rating - " + rating));
+        }
+
 
     }
 }
