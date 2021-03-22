@@ -15,191 +15,66 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main
-{
-    public static void main(String[] args) throws IOException
-    {
+public class Main {
+    public static void main(String[] args) throws IOException {
 
         Configuration configuration = HBaseConfiguration.create();
-        try (Connection connection = ConnectionFactory.createConnection(configuration))
-        {
-//            createTables(connection);
-//            putMetadata(connection, args[0]);
-            putReviews(connection, args[1]);
+        try (Connection connection = ConnectionFactory.createConnection(configuration)) {
+//            printReviewStats(connection);
+            countNullValues(connection);
         }
     }
-
-    private static void putReviews(Connection connection, String reviewFileName) throws IOException
-    {
-        ObjectMapper objectMapper = new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        File file = new File(reviewFileName);
-        BufferedReader reader = Files.newBufferedReader(file.toPath());
-
-        Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
-        Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
-        Table overallReviewTable = connection.getTable(TableName.valueOf("overallReviews"));
-
-        int lines = 0;
-        List<Put> reviewPuts = new ArrayList<>();
-        List<Put> metadataPuts = new ArrayList<>();
-        List<Put> overallReivewPuts = new ArrayList<>();
-        while (reader.ready())
-        {
-            lines++;
-            String line = reader.readLine();
-            if (lines <= 100)
-            {
-                continue;
-            }
-            Review review = objectMapper.readValue(line, Review.class);
-            reviewPuts.add(review.toReviewPut());
-            metadataPuts.add(review.toMetadataPut());
-            overallReivewPuts.add(review.toOverallReviewPut());
-
-            if (lines % 1000 == 0)
-            {
-                printReviewProgress(lines);
-            }
-
-            if (reviewPuts.size() >= 10000)
-            {
-                reviewTable.put(reviewPuts);
-                reviewPuts.clear();
-                System.out.println("Processed review batch: Line " + lines);
-            }
-
-            if (metadataPuts.size() >= 10000)
-            {
-                metadataTable.put(metadataPuts);
-                metadataPuts.clear();
-                System.out.println("Processed metadata batch: Line " + lines);
-            }
-
-            if (overallReivewPuts.size() >= 10000)
-            {
-                overallReviewTable.put(overallReivewPuts);
-                overallReivewPuts.clear();
-                System.out.println("Processed overall reviews batch: Line " + lines);
-            }
-        }
-
-        reviewTable.put(reviewPuts);
-        System.out.println("Processed review batch: Line " + lines);
-
-        metadataTable.put(metadataPuts);
-        System.out.println("Processed review batch: Line " + lines);
-
-        overallReviewTable.put(overallReivewPuts);
-        System.out.println("Processed overall reviews batch: Line " + lines);
+    public static void countNullValues(Connection connection) throws IOException{
+        System.out.println("WE good");
     }
-
-    private static void printReviewProgress(int iterations)
-    {
-        printProgress(iterations, 157260920);
-    }
-
-    private static void putMetadata(Connection connection, String metadataFileName) throws IOException
-    {
-        ObjectMapper objectMapper = new ObjectMapper()
-                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        File file = new File(metadataFileName);
-        BufferedReader reader = Files.newBufferedReader(file.toPath());
-
-        Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
-        Table productLinksTable = connection.getTable(TableName.valueOf("productLinks"));
-
-        int lines = 0;
-        List<Put> metadataPuts = new ArrayList<>();
-        List<Put> productLinkPuts = new ArrayList<>();
-        while (reader.ready())
-        {
-            lines++;
-            String line = reader.readLine();
-            MetadataEntry metadataEntry = objectMapper.readValue(line, MetadataEntry.class);
-            metadataPuts.add(metadataEntry.toMetadataPut());
-            productLinkPuts.add(metadataEntry.toProductLinkPut());
-
-            if (lines % 1000 == 0)
-            {
-                printMetadataProgress(lines);
-            }
-
-            if (metadataPuts.size() >= 10000)
-            {
-                metadataTable.put(metadataPuts);
-                metadataPuts.clear();
-                System.out.println("Processed metadata batch: Line " + lines);
-            }
-
-            if (productLinkPuts.size() >= 10000)
-            {
-                productLinksTable.put(productLinkPuts);
-                productLinkPuts.clear();
-                System.out.println("Processed product links batch: Line " + lines);
-            }
-        }
-
-        metadataTable.put(metadataPuts);
-        metadataPuts.clear();
-        System.out.println("Processed metadata batch: Line " + lines);
-
-        productLinksTable.put(productLinkPuts);
-        productLinkPuts.clear();
-        System.out.println("Processed product links batch: Line " + lines);
-
-        System.out.println("Done!");
-    }
-
-    private static void printMetadataProgress(int iterations)
-    {
-        printProgress(iterations, 15023059);
-    }
-
-    private static void printProgress(int iterations, int totalIterations)
-    {
-        double percentDone = iterations / (double)totalIterations;
-
-        int barLength = 40;
-        int barProgress = (int)(percentDone * barLength);
-        int barRemaining = barLength - barProgress;
-        String barCharacters = new String(new char[barProgress]).replace("\0", "#");
-        String barFillCharacters = new String(new char[barRemaining]).replace("\0", ".");
-
-        System.out.printf("[%s%s] %.2f%% (%d/%d)%n", barCharacters, barFillCharacters, percentDone * 100, iterations, totalIterations);
-    }
-
-    private static void createTables(Connection connection) throws IOException
-    {
-        Admin admin = connection.getAdmin();
-
-        TableDescriptor reviewsTable = TableDescriptorBuilder.newBuilder(TableName.valueOf("reviews"))
-                .setColumnFamily(ColumnFamilyDescriptorBuilder.of("r")).build();
-
-        admin.createTable(reviewsTable);
-
-        TableDescriptor metadataTable = TableDescriptorBuilder.newBuilder(TableName.valueOf("metadata"))
-                .setColumnFamily(ColumnFamilyDescriptorBuilder.of("m"))
-                .setColumnFamily(ColumnFamilyDescriptorBuilder.of("c"))
-                .setColumnFamily(ColumnFamilyDescriptorBuilder.of("o")).build();
-
-        admin.createTable(metadataTable);
-
-        TableDescriptor productLinksTable = TableDescriptorBuilder.newBuilder(TableName.valueOf("productLinks"))
-                .setColumnFamily(ColumnFamilyDescriptorBuilder.of("m"))
-                .setColumnFamily(ColumnFamilyDescriptorBuilder.of("v"))
-                .setColumnFamily(ColumnFamilyDescriptorBuilder.of("b")).build();
-
-        admin.createTable(productLinksTable);
-
-        TableDescriptor overallReviewsTable = TableDescriptorBuilder.newBuilder(TableName.valueOf("overallReviews"))
-                .setColumnFamily(ColumnFamilyDescriptorBuilder.of("o")).build();
-
-        admin.createTable(overallReviewsTable);
-
-        TableDescriptor brandReviews = TableDescriptorBuilder.newBuilder(TableName.valueOf("brandReviews"))
-                .setColumnFamily(ColumnFamilyDescriptorBuilder.of("o")).build();
-
-        admin.createTable(brandReviews);
-    }
+//    public static double[] getReviewAverage(long[] reviews) {
+//        long total = 0;
+//
+//        for (int i = 0; i < 6; i++) {
+//            total += reviews[i];
+//        }
+//
+//        double[] averages = new double[2];
+//
+//        for (int i = 1; i < 6; i++) {
+//            averages[0] += (double) i * reviews[i] / total;
+//            averages[1] += (double) i * reviews[i] / (total - reviews[0]);
+//        }
+//
+//        return averages;
+//    }
+//    public static void printReviewStats(Connection connection) throws IOException {
+//        // question 1 (easy) - reviews
+//        System.out.println("Printing review rating stats.");
+//
+//        Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
+//
+//        Scan scan = new Scan();
+//
+//        byte[] ratingFamily = Bytes.toBytes("r");
+//
+//        byte[] ratingColumn = Bytes.toBytes("rating");
+//
+//        scan.addColumn(ratingFamily, ratingColumn);
+//
+//        ResultScanner reviewScan = reviewTable.getScanner(scan);
+//
+//        // assuming that reviews can only be 0, 1, 2, 3, 4, 5
+//        long[] reviews = new long[6];
+//
+//        for (Result result = reviewScan.next(); result != null; result = reviewScan.next()) {
+//            short tmp = Bytes.toShort(result.getValue(ratingFamily, ratingColumn));
+//            reviews[tmp] += 1;
+//        }
+//
+//        double[] averages = getReviewAverage(reviews);
+//
+//        System.out.println("Review information: avg: " + averages[0] + ", avg (no zeroes): " + averages[1]);
+//
+//        for (int i = 0; i < 6; i++) {
+//            System.out.println("Review count for " + i + ": " + reviews[i]);
+//        }
+//
+//        reviewScan.close();
+//    }
 }
