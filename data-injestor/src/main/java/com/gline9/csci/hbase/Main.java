@@ -65,8 +65,8 @@ public class Main {
         ResultScanner brandScan = reviewTable.getScanner(brandScanner);
 
         for (Result result = reviewScan.next(); result != null; result = reviewScan.next()) {
-            short tmp = Bytes.toShort(result.getValue(ratingFamily, reviewColumn));
-            System.out.println(tmp);
+            String review = Bytes.toString(result.getValue(ratingFamily, reviewColumn));
+            System.out.println(review);
         }
 
 
