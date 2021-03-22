@@ -21,8 +21,8 @@ public class Main {
 
         Configuration configuration = HBaseConfiguration.create();
         try (Connection connection = ConnectionFactory.createConnection(configuration)) {
-            //countNullValues(connection);
-            findCorrelation(connection);
+            countNullValues(connection);
+            //findCorrelation(connection);
             //findRelationship(connection);
         }
     }
@@ -78,6 +78,9 @@ public class Main {
 
         for (Result result = reviewScan.next(); result != null; result = reviewScan.next()) {
             String review = Bytes.toString(result.getValue(ratingFamily, reviewColumn));
+            short rating = Bytes.toShort(result.getValue(ratingFamily, ratingColumn));
+            System.out.println("Review : " + review);
+            System.out.println("Rating : " + rating);
             if (review.equals("")) {
                 nullReviewCount += 1;
             }
