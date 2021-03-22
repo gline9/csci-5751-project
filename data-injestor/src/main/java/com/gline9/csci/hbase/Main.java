@@ -133,18 +133,24 @@ public class Main {
         Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
 
         Scan reviewScan = new Scan();
+        Scan metadataScan = new Scan();
         byte[] ratingFamily = Bytes.toBytes("r");
         byte[] ratingColumn = Bytes.toBytes("rating");
         byte[] metadataFamily = Bytes.toBytes("m");
         byte[] priceColumn = Bytes.toBytes("price");
 
         ResultScanner reviewScanner = reviewTable.getScanner(reviewScan);
+        ResultScanner metadataScanner = metadataTable.getScanner(reviewScan);
 
-        for(Result result : reviewScanner){
-            String key = Bytes.toString(result.getRow());
-            short rating = Bytes.toShort(result.getValue(ratingFamily,ratingColumn));
-            double price = Bytes.toDouble(result.getValue(metadataFamily,priceColumn));
-            System.out.println("KEY - " + key + "VALUE - " + rating + "Price - " + price);
+        for(Result reviewResult : reviewScanner){
+            String reviewKey = Bytes.toString(reviewResult.getRow());
+            short rating = Bytes.toShort(reviewResult.getValue(ratingFamily,ratingColumn));
+            for(Result priceResult: metadataScanner){
+                String metadataKey = Bytes.toString(reviewResult.getRow());
+                double price = Bytes.toDouble(priceResult.getValue(metadataFamily,priceColumn));
+                System.out.println("ReviewKEY - " + reviewKey + "VALUE - " + rating + "MetadataKey - " + metadataKey + "Price - " + price);
+
+            }
         }
 
     }
