@@ -279,33 +279,35 @@ public class Main {
             String rowKey = Bytes.toString(result.getRow());
             // should be category-brand
             String[] splitRowKey = rowKey.split("-");
-            // it would probably be more efficient to have this loop closer to the put
-            for (Cell cell : result.rawCells()) {
-                short tmp = Bytes.toShort(CellUtil.cloneValue(cell));
-                if (catBrandReviewsMap.containsKey(splitRowKey[0])) {
-                    HashMap<String, HashMap<Short, Long>> brandReviewsMap = catBrandReviewsMap.get(splitRowKey[0]);
-                    if (brandReviewsMap.containsKey(splitRowKey[1])) {
-                        HashMap<Short, Long> reviewsMap = brandReviewsMap.get(splitRowKey[1]);
-                        if (reviewsMap.containsKey(tmp)) {
-                            // we have brand, category, and rating
-                            reviewsMap.put(tmp, reviewsMap.get(tmp) + 1);
+            if (splitRowKey.length == 2) {
+                // it would probably be more efficient to have this loop closer to the put
+                for (Cell cell : result.rawCells()) {
+                    short tmp = Bytes.toShort(CellUtil.cloneValue(cell));
+                    if (catBrandReviewsMap.containsKey(splitRowKey[0])) {
+                        HashMap<String, HashMap<Short, Long>> brandReviewsMap = catBrandReviewsMap.get(splitRowKey[0]);
+                        if (brandReviewsMap.containsKey(splitRowKey[1])) {
+                            HashMap<Short, Long> reviewsMap = brandReviewsMap.get(splitRowKey[1]);
+                            if (reviewsMap.containsKey(tmp)) {
+                                // we have brand, category, and rating
+                                reviewsMap.put(tmp, reviewsMap.get(tmp) + 1);
+                            } else {
+                                // we have brand, category, but not rating
+                                reviewsMap.put(tmp, 1L);
+                            }
                         } else {
-                            // we have brand, category, but not rating
+                            // we have the category, but not the brand or rating
+                            HashMap<Short, Long> reviewsMap = new HashMap<>();
                             reviewsMap.put(tmp, 1L);
+                            brandReviewsMap.put(splitRowKey[1], reviewsMap);
                         }
                     } else {
-                        // we have the category, but not the brand or rating
+                        // we don't have the category or the brand or rating
                         HashMap<Short, Long> reviewsMap = new HashMap<>();
                         reviewsMap.put(tmp, 1L);
+                        HashMap<String, HashMap<Short, Long>> brandReviewsMap = new HashMap<>();
                         brandReviewsMap.put(splitRowKey[1], reviewsMap);
+                        catBrandReviewsMap.put(splitRowKey[0], brandReviewsMap);
                     }
-                } else {
-                    // we don't have the category or the brand or rating
-                    HashMap<Short, Long> reviewsMap = new HashMap<>();
-                    reviewsMap.put(tmp, 1L);
-                    HashMap<String, HashMap<Short, Long>> brandReviewsMap = new HashMap<>();
-                    brandReviewsMap.put(splitRowKey[1], reviewsMap);
-                    catBrandReviewsMap.put(splitRowKey[0], brandReviewsMap);
                 }
             }
         }
