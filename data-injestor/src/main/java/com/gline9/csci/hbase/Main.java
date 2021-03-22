@@ -140,6 +140,9 @@ public class Main {
         byte[] metadataFamily = Bytes.toBytes("m");
         byte[] priceColumn = Bytes.toBytes("price");
 
+        reviewScan.addColumn(ratingFamily,ratingColumn);
+        metadataScan.addColumn(metadataFamily,priceColumn);
+
         ResultScanner reviewScanner = reviewTable.getScanner(reviewScan);
         ResultScanner metadataScanner = metadataTable.getScanner(metadataScan);
 
