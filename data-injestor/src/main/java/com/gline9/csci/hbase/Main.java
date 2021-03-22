@@ -30,8 +30,17 @@ public class Main {
     public static void countNullValues(Connection connection) throws IOException {
         Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
         Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
+
         Scan reviewsScan = new Scan();
-        Scan metadataScan = new Scan();
+        Scan ratingScan = new Scan();
+        Scan summaryScan = new Scan();
+        Scan reviewerIDScan = new Scan();
+
+        Scan titleScan = new Scan();
+        Scan priceScan = new Scan();
+        Scan brandScan = new Scan();
+
+
 
         //Review Dataset review column family and columns
         byte[] ratingFamily = Bytes.toBytes("r");
@@ -46,16 +55,24 @@ public class Main {
         byte[] priceColumn = Bytes.toBytes("price");
         byte[] brandColumn = Bytes.toBytes("brand");
 
-        reviewsScan.addColumn(ratingFamily, ratingColumn);
+        ratingScan.addColumn(ratingFamily, ratingColumn);
         reviewsScan.addColumn(ratingFamily, reviewColumn);
-        reviewsScan.addColumn(ratingFamily, reviewerIDColumn);
-        reviewsScan.addColumn(ratingFamily, summaryColumn);
-        metadataScan.addColumn(metadataFamily, titleColumn);
-        metadataScan.addColumn(metadataFamily, priceColumn);
-        metadataScan.addColumn(metadataFamily, brandColumn);
+        reviewerIDScan.addColumn(ratingFamily, reviewerIDColumn);
+        summaryScan.addColumn(ratingFamily, summaryColumn);
+
+        titleScan.addColumn(metadataFamily, titleColumn);
+        priceScan.addColumn(metadataFamily, priceColumn);
+        brandScan.addColumn(metadataFamily, brandColumn);
 
         ResultScanner reviewScanner = reviewTable.getScanner(reviewsScan);
-        ResultScanner metadataScanner = metadataTable.getScanner(metadataScan);
+        ResultScanner ratingScanner = reviewTable.getScanner(ratingScan);
+        ResultScanner reviewerIDScanner = reviewTable.getScanner(reviewerIDScan);
+        ResultScanner summaryScanner = reviewTable.getScanner(summaryScan);
+
+        ResultScanner titleScanner = metadataTable.getScanner(titleScan);
+        ResultScanner priceScanner = metadataTable.getScanner(priceScan);
+        ResultScanner brandScanner = metadataTable.getScanner(brandScan);
+
         int nullReviewCount = 0;
         int nullRatingCount = 0;
         int nullReviewerIDCount = 0;
@@ -67,39 +84,51 @@ public class Main {
 
         for (Result result = reviewScanner.next(); result != null; result = reviewScanner.next()) {
             String review = Bytes.toString(result.getValue(ratingFamily, reviewColumn));
-            short rating = Bytes.toShort(result.getValue(ratingFamily, ratingColumn));
-            String reviewerID = Bytes.toString(result.getValue(ratingFamily, reviewerIDColumn));
-            String summary = Bytes.toString(result.getValue(metadataFamily, summaryColumn));
 
             if (review.equals("")) {
                 nullReviewCount += 1;
             }
-            if (reviewerID.equals("")) {
-                nullReviewerIDCount += 1;
-            }
+        }
+        for (Result result = ratingScanner.next(); result != null; result = ratingScanner.next()) {
+            short rating = Bytes.toShort(result.getValue(ratingFamily, ratingColumn));
             if (rating == 0) {
                 nullRatingCount += 1;
             }
+        }
+        for (Result result = reviewerIDScanner.next(); result != null; result = reviewerIDScanner.next()) {
+            String reviewerID = Bytes.toString(result.getValue(ratingFamily, reviewerIDColumn));
+            if (reviewerID.equals("")) {
+                nullReviewerIDCount += 1;
+            }
+        }
+        for (Result result = summaryScanner.next(); result != null; result = summaryScanner.next()) {
+            String summary = Bytes.toString(result.getValue(metadataFamily, summaryColumn));
             if (summary.equals("")) {
                 nullSummaryCount += 1;
             }
         }
-
-        for (Result result = metadataScanner.next(); result != null; result = metadataScanner.next()) {
+        for (Result result = titleScanner.next(); result != null; result = titleScanner.next()) {
             String title = Bytes.toString(result.getValue(metadataFamily, titleColumn));
-            double price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
-            String brand = Bytes.toString(result.getValue(metadataFamily, brandColumn));
 
             if (title.equals("")) {
                 nullTitleCount += 1;
             }
+
+
+        }
+        for (Result result = priceScanner.next(); result != null; result = priceScanner.next()) {
+            double price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
             if (price == 0) {
                 nullPriceCount += 1;
             }
+        }
+        for (Result result = brandScanner.next(); result != null; result = brandScanner.next()) {
+            String brand = Bytes.toString(result.getValue(metadataFamily, brandColumn));
             if (brand.equals("")) {
                 nullBrandCount += 1;
             }
         }
+
         System.out.println("     Printing stats");
         System.out.println("-------------------------");
         System.out.println("Null Review Count: " + nullReviewCount);
