@@ -84,9 +84,9 @@ public class Main {
 //            String[] tmp = metadataKey.split("-", 2);
 //            metadataKey = tmp[0];
             for (Map.Entry<byte[], byte[]> entry : familyMap.entrySet()) {
-                System.out.println(entry.getKey());
-                System.out.println(priceColumn);
-                System.out.println(result.getValue(reviewFamily, entry.getKey()));
+//                System.out.println(entry.getKey());
+//                System.out.println(priceColumn);
+//                System.out.println(result.getValue(reviewFamily, entry.getKey()));
                 if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, result.getValue(metadataFamily, entry.getKey())) != null) {
                     System.out.println("We are in");
                     if (previousKey == metadataKey) {
