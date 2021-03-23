@@ -9,7 +9,8 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.protobuf.generated.ClientProtos;
 import org.apache.hadoop.hbase.util.Bytes;
-
+import org.math.plot.*;
+import javax.swing.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.io.BufferedReader;
@@ -116,7 +117,13 @@ public class Main {
 
         }
         System.out.println("Price list size - " + priceList.size() + "\n" + "Overall list size - " + overallList.size());
-
+        Plot2DPanel plot = new Plot2DPanel();
+        // add a line plot to the PlotPanel
+        plot.addScatterPlot("Test", priceList, overallList);
+        // put the PlotPanel in a JFrame, as a JPanel
+        JFrame frame = new JFrame("a plot panel");
+        frame.setContentPane(plot);
+        frame.setVisible(true);
     }
 
 
