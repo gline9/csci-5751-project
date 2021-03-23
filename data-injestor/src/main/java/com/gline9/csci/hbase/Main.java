@@ -50,6 +50,8 @@ public class Main {
 
         byte[] metadataFamily = Bytes.toBytes("m");
         byte[] overallFamily = Bytes.toBytes("o");
+        byte[] reviewFamily = Bytes.toBytes("r");
+
 
         byte[] priceColumn = Bytes.toBytes("price");
         byte[] reviewerIDColumn = Bytes.toBytes("reviewerID");
@@ -65,18 +67,18 @@ public class Main {
         ArrayList<Double> overallList = new ArrayList<Double>();
 
         String previousKey = "";
-//        for(Result result: metadataScanner){
-//            previousKey = Bytes.toString(result.getRow());
-//            System.out.println("Previous key first assigned as " + previousKey);
-//            break;
-//        }
+        for(Result result: metadataScanner){
+            previousKey = Bytes.toString(result.getRow());
+            System.out.println("Previous key first assigned as " + previousKey);
+            break;
+        }
 
         for (Result result : metadataScanner) {
             String metadataKey = Bytes.toString(result.getRow());
 //            String[] tmp = metadataKey.split("-", 2);
 //            metadataKey = tmp[0];
-            System.out.println(Bytes.toDouble(result.getValue(metadataFamily, priceColumn)) + Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn)));
-            if(result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily,reviewerIDColumn) != null){
+            System.out.println(Bytes.toDouble(result.getValue(metadataFamily, priceColumn)) + Bytes.toShort(result.getValue(overallFamily,result.getValue(reviewFamily,reviewerIDColumn))));
+            if(result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, result.getValue(reviewFamily,reviewerIDColumn)) != null){
                 System.out.println("We are in");
                 if (previousKey == metadataKey) {
                     price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
