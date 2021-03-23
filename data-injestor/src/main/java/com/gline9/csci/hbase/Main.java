@@ -95,16 +95,14 @@ public class Main {
             for (Map.Entry<byte[], byte[]> entry : familyMap.entrySet()) {
                 if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, entry.getKey()) != null) {
                     metadataKey = Bytes.toString(result.getRow());
-                    System.out.println("Previous key - " + previousKey + " \nMetadata key - " + metadataKey);
-                    System.out.println("EQUAL?" + previousKey.equals(metadataKey));
                     if (previousKey.equals(metadataKey)) {
                         price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
                         overall += Bytes.toShort(result.getValue(overallFamily, entry.getKey()));
                         count += 1;
-                        System.out.println("Price  - " + price + " \n Overall - " + " overall");
+                        //System.out.println("Price  - " + price + " \n Overall - " + overall);
 
                     } else {
-                        System.out.println("Adding price - " + price + " Overall - " + (double) overall / count);
+                        //System.out.println("Adding price - " + price + " Overall - " + (double) overall / count);
                         previousKey = metadataKey;
                         priceList.add(price);
                         overallList.add((double) overall / count);
@@ -113,6 +111,8 @@ public class Main {
                     }
                 }
             }
+            System.out.println("Adding price - " + price + " Overall - " + (double) overall / count);
+
         }
         System.out.println("Price list size - " + priceList.size() + "\n" + "Overall list size - " + overallList.size());
 
