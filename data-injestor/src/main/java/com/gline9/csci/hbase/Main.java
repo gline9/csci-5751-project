@@ -75,6 +75,7 @@ public class Main {
             String metadataKey = Bytes.toString(result.getRow());
 //            String[] tmp = metadataKey.split("-", 2);
 //            metadataKey = tmp[0];
+            System.out.println(Bytes.toDouble(result.getValue(metadataFamily, priceColumn)) + Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn)));
             if(result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily,reviewerIDColumn) != null){
                 System.out.println("We are in");
                 if (previousKey == metadataKey) {
