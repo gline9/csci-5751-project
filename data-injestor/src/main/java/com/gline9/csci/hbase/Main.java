@@ -45,9 +45,10 @@ public class Main {
 
     public static void findRelationship(Connection connection) throws IOException {
         Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
+        Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
 
         Scan metadataScan = new Scan();
-
+        Scan reviewScan = new Scan();
         byte[] metadataFamily = Bytes.toBytes("m");
         byte[] overallFamily = Bytes.toBytes("o");
         byte[] reviewFamily = Bytes.toBytes("r");
@@ -60,6 +61,7 @@ public class Main {
         //metadataScan.addColumn(overallFamily,reviewerIDColumn);
 
         ResultScanner metadataScanner = metadataTable.getScanner(metadataScan);
+        ResultScanner reviewScanner = reviewTable.getScanner(reviewScan);
         double price = 0;
         int overall = 0;
         int count = 0;
@@ -77,26 +79,26 @@ public class Main {
             String metadataKey = Bytes.toString(result.getRow());
 //            String[] tmp = metadataKey.split("-", 2);
 //            metadataKey = tmp[0];
-            //System.out.println(Bytes.toDouble(result.getValue(metadataFamily, priceColumn)) + Bytes.toShort(result.getValue(overallFamily,result.getValue(reviewFamily,reviewerIDColumn))));
-            if(result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, result.getValue(reviewFamily,reviewerIDColumn)) != null){
-                System.out.println("We are in");
-                if (previousKey == metadataKey) {
-                    price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
-                    overall += Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
-                    System.out.println("Price  - " + price + " \n Overall - " + " overall");
-
-                } else if (previousKey != metadataKey) {
-                    System.out.println("Adding price - " + price + " Overall - " + (double)overall/count);
-                    previousKey = metadataKey;
-                    priceList.add(price);
-                    overallList.add((double) overall / count);
-                    count = 1;
-                    overall = Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
-                }
-                count += 1;
-            }
+            System.out.println(result);
+//            if(result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, result.getValue(reviewFamily,reviewerIDColumn)) != null){
+//                System.out.println("We are in");
+//                if (previousKey == metadataKey) {
+//                    price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
+//                    overall += Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
+//                    System.out.println("Price  - " + price + " \n Overall - " + " overall");
+//
+//                } else if (previousKey != metadataKey) {
+//                    System.out.println("Adding price - " + price + " Overall - " + (double)overall/count);
+//                    previousKey = metadataKey;
+//                    priceList.add(price);
+//                    overallList.add((double) overall / count);
+//                    count = 1;
+//                    overall = Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
+//                }
+//                count += 1;
+//            }
         }
-        System.out.println("Price list size - " + priceList.size() + "\n" + "Overall list size - " + overallList.size());
+//        System.out.println("Price list size - " + priceList.size() + "\n" + "Overall list size - " + overallList.size());
 
     }
 
