@@ -8,7 +8,7 @@ import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
-
+import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +23,7 @@ public class Main {
         try (Connection connection = ConnectionFactory.createConnection(configuration)) {
             //countNullValues(connection);
             //findCorrelation(connection);
-            //findRelationship(connection);
+            findRelationship(connection);
         }
     }
 
@@ -58,17 +58,38 @@ public class Main {
         //metadataScan.addColumn(overallFamily,reviewerIDColumn);
 
         ResultScanner metadataScanner = metadataTable.getScanner(metadataScan);
+        double price = 0;
+        int overall = 0;
+        int count = 0;
+        ArrayList<Double> priceList = new ArrayList<Double>();
+        ArrayList<Double> overallList = new ArrayList<Double>();
+
+        String previousKey = "";
+        for(Result result: metadataScanner){
+            previousKey = Bytes.toString(result.getRow());
+            System.out.println("Previous key first assigned as " + previousKey);
+            break;
+        }
 
         for (Result result : metadataScanner) {
             String metadataKey = Bytes.toString(result.getRow());
-            String[] tmp = metadataKey.split("-", 2);
-            metadataKey = tmp[0];
-            if (Bytes.toDouble(result.getValue(metadataFamily, priceColumn)) != 0 && Bytes.toShort(result.getValue(overallFamily,reviewerIDColumn)) != 0){
-                double price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
-                int overall = Bytes.toShort(result.getValue(overallFamily,reviewerIDColumn));
+//            String[] tmp = metadataKey.split("-", 2);
+//            metadataKey = tmp[0];
+            if(result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily,reviewerIDColumn) != null){
+                if (previousKey == metadataKey) {
+                    price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
+                    overall += Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
+                } else if (previousKey != metadataKey) {
+                    previousKey = metadataKey;
+                    priceList.add(price);
+                    overallList.add((double) overall / count);
+                    count = 1;
+                    overall = Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
+                }
+                count += 1;
             }
-
         }
+        System.out.println("Price list size - " + priceList.size() + "\n" + "Overall list size - " + overallList.size());
 
     }
 
