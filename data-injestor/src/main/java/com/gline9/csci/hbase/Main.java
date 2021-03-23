@@ -87,10 +87,7 @@ public class Main {
 //                System.out.println(entry.getKey());
 //                System.out.println(priceColumn);
 //                System.out.println(result.getValue(reviewFamily, entry.getKey()));
-                if (result.getValue(metadataFamily, priceColumn) != null){
-                    System.out.println("Hello world");
-                }
-                if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, result.getValue(metadataFamily, entry.getKey())) != null) {
+                if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, entry.getKey()) != null) {
                     System.out.println("We are in");
                     if (previousKey == metadataKey) {
                         price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
