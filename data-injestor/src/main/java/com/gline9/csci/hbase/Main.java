@@ -106,6 +106,7 @@ public class Main {
                         previousKey = metadataKey;
                         priceList.add(price);
                         System.out.println(overall + " and " +  count);
+                        overall = (int) overall;
                         overallList.add((double)overall/count);
                         count = 1;
                         overall = Bytes.toShort(result.getValue(overallFamily, entry.getKey()));
