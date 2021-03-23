@@ -53,7 +53,7 @@ public class Main {
         Scan reviewScan = new Scan();
         byte[] metadataFamily = Bytes.toBytes("m");
         byte[] overallFamily = Bytes.toBytes("o");
-        byte[] reviewFamily = Bytes.toBytes("r");
+//        byte[] reviewFamily = Bytes.toBytes("r");
 
 
         byte[] priceColumn = Bytes.toBytes("price");
@@ -87,6 +87,9 @@ public class Main {
 //                System.out.println(entry.getKey());
 //                System.out.println(priceColumn);
 //                System.out.println(result.getValue(reviewFamily, entry.getKey()));
+                if (result.getValue(metadataFamily, priceColumn) != null){
+                    System.out.println("Hello world");
+                }
                 if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, result.getValue(metadataFamily, entry.getKey())) != null) {
                     System.out.println("We are in");
                     if (previousKey == metadataKey) {
