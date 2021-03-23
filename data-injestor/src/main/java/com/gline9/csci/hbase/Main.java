@@ -99,7 +99,7 @@ public class Main {
                     System.out.println("EQUAL?" + previousKey.equals(metadataKey));
                     if (previousKey.equals(metadataKey)) {
                         price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
-                        overall += Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
+                        overall += Bytes.toShort(result.getValue(overallFamily, entry.getKey()));
                         count += 1;
                         System.out.println("Price  - " + price + " \n Overall - " + " overall");
 
@@ -109,7 +109,7 @@ public class Main {
                         priceList.add(price);
                         overallList.add((double) overall / count);
                         count = 1;
-                        overall = Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
+                        overall = Bytes.toShort(result.getValue(overallFamily, entry.getKey()));
                     }
                 }
             }
