@@ -256,11 +256,12 @@ public class Main {
                 //System.out.println("Null summary count incremented.");
 
             }
-            System.out.println("Null Review Count: " + nullReviewCount);
-            System.out.println("Null Rating Count: " + nullRatingCount);
-            System.out.println("Null Reviewer Count: " + nullReviewerIDCount);
-            System.out.println("Null Summary Count: " + nullSummaryCount);
+
         }
+        System.out.println("Null Review Count: " + nullReviewCount);
+        System.out.println("Null Rating Count: " + nullRatingCount);
+        System.out.println("Null Reviewer Count: " + nullReviewerIDCount);
+        System.out.println("Null Summary Count: " + nullSummaryCount);
         for(Result result : metadataScanner){
             if(Bytes.toString(result.getValue(metadataFamily, titleColumn))== null){
                 nullTitleCount += 1;
