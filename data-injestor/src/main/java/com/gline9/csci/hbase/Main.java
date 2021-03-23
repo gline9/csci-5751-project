@@ -234,41 +234,54 @@ public class Main {
         ResultScanner metadataScanner = metadataTable.getScanner(metadataScan);
         for (Result result : reviewScanner) {
             if(Bytes.toShort(result.getValue(ratingFamily, ratingColumn)) == 0){
-                System.out.println("Null rating count incremented.");
+                //System.out.println("Rating - " + Bytes.toShort(result.getValue(ratingFamily, ratingColumn)));
+                //System.out.println("Null rating count incremented.");
                 nullRatingCount += 1;
             }
-            if(Bytes.toString(result.getValue(ratingFamily, reviewColumn)).equals("")){
+            if(Bytes.toString(result.getValue(ratingFamily, reviewColumn)) == null){
                 nullReviewCount += 1;
-                System.out.println("Null review count incremented.");
+                //System.out.println("Review - " + Bytes.toString(result.getValue(ratingFamily, reviewColumn)));
+                //System.out.println("Null review count incremented.");
 
             }
-            if(Bytes.toString(result.getValue(ratingFamily, reviewerIDColumn)).equals("")){
+            if(Bytes.toString(result.getValue(ratingFamily, reviewerIDColumn)) == null){
                 nullReviewerIDCount += 1;
-                System.out.println("Null reviewerID count incremented.");
+                //System.out.println("ReviewerID - " + Bytes.toString(result.getValue(ratingFamily, reviewerIDColumn)));
+                //System.out.println("Null reviewerID count incremented.");
 
             }
-            if(Bytes.toString(result.getValue(ratingFamily, summaryColumn)).equals("")){
+            if(Bytes.toString(result.getValue(ratingFamily, summaryColumn))== null){
                 nullSummaryCount += 1;
-                System.out.println("Null summary count incremented.");
+                //System.out.println("Summary - " + Bytes.toString(result.getValue(ratingFamily, summaryColumn)));
+                //System.out.println("Null summary count incremented.");
 
             }
+            System.out.println("Null Review Count: " + nullReviewCount);
+            System.out.println("Null Rating Count: " + nullRatingCount);
+            System.out.println("Null Reviewer Count: " + nullReviewerIDCount);
+            System.out.println("Null Summary Count: " + nullSummaryCount);
         }
         for(Result result : metadataScanner){
-            if(Bytes.toString(result.getValue(metadataFamily, titleColumn)).equals("")){
+            if(Bytes.toString(result.getValue(metadataFamily, titleColumn))== null){
                 nullTitleCount += 1;
-                System.out.println("Null title count incremented.");
+                //System.out.println("Title - " + Bytes.toString(result.getValue(metadataFamily, titleColumn)));
+                //System.out.println("Null title count incremented.");
 
             }
             if(Bytes.toDouble(result.getValue(metadataFamily, priceColumn)) == 0){
                 nullPriceCount += 1;
-                System.out.println("Null price count incremented.");
+                //System.out.println("Title - " + Bytes.toString(result.getValue(metadataFamily, titleColumn)));
+                //System.out.println("Null price count incremented.");
 
             }
-            if(Bytes.toString(result.getValue(metadataFamily, brandColumn)).equals("")){
+            if(Bytes.toString(result.getValue(metadataFamily, brandColumn))== null){
                 nullBrandCount += 1;
-                System.out.println("Null brand count incremented.");
+                //System.out.println("Null brand count incremented.");
 
             }
+            System.out.println("Null Title Count: " + nullTitleCount);
+            System.out.println("Null Price Count: " + nullPriceCount);
+            System.out.println("Null Brand Count: " + nullBrandCount);
         }
 
 
