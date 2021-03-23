@@ -9,13 +9,14 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.protobuf.generated.ClientProtos;
 import org.apache.hadoop.hbase.util.Bytes;
-import java.util.ArrayList;
+
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -77,11 +78,16 @@ public class Main {
         }
 
         for (Result result : metadataScanner) {
+            NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(overallFamily);
+
             String metadataKey = Bytes.toString(result.getRow());
 //            String[] tmp = metadataKey.split("-", 2);
 //            metadataKey = tmp[0];
+            for (Map.Entry<byte[], byte[]> entry : familyMap.entrySet()) {
+                String sid = new String(entry.getKey(), StandardCharsets.UTF_8);
+                System.out.println(sid);
+            }
 
-            System.out.println(result.getFamilyMap(overallFamily).get(reviewerIDColumn));
 //            if(result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, result.getValue(reviewFamily,reviewerIDColumn)) != null){
 //                System.out.println("We are in");
 //                if (previousKey == metadataKey) {
