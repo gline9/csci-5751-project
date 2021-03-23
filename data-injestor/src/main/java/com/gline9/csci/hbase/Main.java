@@ -77,12 +77,14 @@ public class Main {
             String metadataKey = Bytes.toString(result.getRow());
 //            String[] tmp = metadataKey.split("-", 2);
 //            metadataKey = tmp[0];
-            System.out.println(Bytes.toDouble(result.getValue(metadataFamily, priceColumn)) + Bytes.toShort(result.getValue(overallFamily,result.getValue(reviewFamily,reviewerIDColumn))));
+            //System.out.println(Bytes.toDouble(result.getValue(metadataFamily, priceColumn)) + Bytes.toShort(result.getValue(overallFamily,result.getValue(reviewFamily,reviewerIDColumn))));
             if(result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, result.getValue(reviewFamily,reviewerIDColumn)) != null){
                 System.out.println("We are in");
                 if (previousKey == metadataKey) {
                     price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
                     overall += Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
+                    System.out.println("Price  - " + price + " \n Overall - " + " overall");
+
                 } else if (previousKey != metadataKey) {
                     System.out.println("Adding price - " + price + " Overall - " + (double)overall/count);
                     previousKey = metadataKey;
