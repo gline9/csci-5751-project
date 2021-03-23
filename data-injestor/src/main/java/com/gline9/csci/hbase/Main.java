@@ -71,25 +71,28 @@ public class Main {
         ArrayList<Double> overallList = new ArrayList<Double>();
 
         String previousKey = "";
-        for(Result result: metadataScanner){
-            previousKey = Bytes.toString(result.getRow());
-            System.out.println("Previous key first assigned as " + previousKey);
+        for (Result result : metadataScanner) {
+            NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(overallFamily);
+
+            String metadataKey = Bytes.toString(result.getRow());
+            for (Map.Entry<byte[], byte[]> entry : familyMap.entrySet()) {
+
+                if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, entry.getKey()) != null) {
+                    previousKey = Bytes.toString(result.getRow());
+                }
+            }
             break;
         }
 
         for (Result result : metadataScanner) {
             NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(overallFamily);
-
-            String metadataKey = Bytes.toString(result.getRow());
-//            String[] tmp = metadataKey.split("-", 2);
-//            metadataKey = tmp[0];
             for (Map.Entry<byte[], byte[]> entry : familyMap.entrySet()) {
 //                System.out.println(entry.getKey());
 //                System.out.println(priceColumn);
 //                System.out.println(result.getValue(reviewFamily, entry.getKey()));
                 if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, entry.getKey()) != null) {
-                    System.out.println("We are in");
-                    System.out.println("Previous key - " + previousKey + " \n Metadata key - " + metadataKey);
+                    String metadataKey = Bytes.toString(result.getRow());
+                    System.out.println("Previous key - " + previousKey + " \nMetadata key - " + metadataKey);
                     if (previousKey == metadataKey) {
                         price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
                         overall += Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
