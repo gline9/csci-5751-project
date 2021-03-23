@@ -87,14 +87,12 @@ public class Main {
                 break;
             }
         }
+        metadataScanner = metadataTable.getScanner(metadataScan);
 
         for (Result result : metadataScanner) {
             NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(overallFamily);
             String metadataKey = Bytes.toString(result.getRow());
             for (Map.Entry<byte[], byte[]> entry : familyMap.entrySet()) {
-//                System.out.println(entry.getKey());
-//                System.out.println(priceColumn);
-//                System.out.println(result.getValue(reviewFamily, entry.getKey()));
                 if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, entry.getKey()) != null) {
                     metadataKey = Bytes.toString(result.getRow());
                     System.out.println("Previous key - " + previousKey + " \nMetadata key - " + metadataKey);
