@@ -96,13 +96,13 @@ public class Main {
                 if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, entry.getKey()) != null) {
                     metadataKey = Bytes.toString(result.getRow());
                     System.out.println("Previous key - " + previousKey + " \nMetadata key - " + metadataKey);
-                    if (previousKey == metadataKey) {
+                    if (previousKey.equals(metadataKey)) {
                         price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
                         overall += Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
                         count += 1;
                         System.out.println("Price  - " + price + " \n Overall - " + " overall");
 
-                    } else if (previousKey != metadataKey) {
+                    } else {
                         System.out.println("Adding price - " + price + " Overall - " + (double) overall / count);
                         previousKey = metadataKey;
                         priceList.add(price);
