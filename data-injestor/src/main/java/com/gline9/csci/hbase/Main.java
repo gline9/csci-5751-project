@@ -100,14 +100,13 @@ public class Main {
                         overall += (double)Bytes.toShort(result.getValue(overallFamily, entry.getKey()));
                         count += 1.0;
                         //System.out.println("Price  - " + price + " \n Overall - " + overall);
-
                     } else {
                         //System.out.println("Adding price - " + price + " Overall - " + (double) overall / count);
                         previousKey = metadataKey;
                         priceList.add(price);
-                        System.out.println(overall + " and " +  count);
+                        //System.out.println(overall + " and " +  count);
                         overallList.add((double)overall/count);
-                        System.out.println("Adding price - " + price + " Overall - " + (double)overall/count);
+                        //System.out.println("Adding price - " + price + " Overall - " + (double)overall/count);
                         count = 1.0;
                         overall = Bytes.toShort(result.getValue(overallFamily, entry.getKey()));
                         price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
