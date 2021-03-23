@@ -24,123 +24,9 @@ public class Main {
             //countNullValues(connection);
             //findCorrelation(connection);
             //findRelationship(connection);
-            testNull(connection);
         }
     }
 
-    public static void countNullValues(Connection connection) throws IOException {
-        Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
-        Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
-
-        Scan reviewsScan = new Scan();
-        Scan ratingScan = new Scan();
-        Scan summaryScan = new Scan();
-        Scan reviewerIDScan = new Scan();
-
-        Scan titleScan = new Scan();
-        Scan priceScan = new Scan();
-        Scan brandScan = new Scan();
-
-
-        //Review Dataset review column family and columns
-        byte[] ratingFamily = Bytes.toBytes("r");
-        byte[] ratingColumn = Bytes.toBytes("rating");
-        byte[] reviewColumn = Bytes.toBytes("review");
-        byte[] summaryColumn = Bytes.toBytes("summary");
-        byte[] reviewerIDColumn = Bytes.toBytes("reviewerID");
-
-        //Metadata dataset metadata column family and columns
-        byte[] metadataFamily = Bytes.toBytes("m");
-        byte[] titleColumn = Bytes.toBytes("title");
-        byte[] priceColumn = Bytes.toBytes("price");
-        byte[] brandColumn = Bytes.toBytes("brand");
-
-        ratingScan.addColumn(ratingFamily, ratingColumn);
-        reviewsScan.addColumn(ratingFamily, reviewColumn);
-        reviewerIDScan.addColumn(ratingFamily, reviewerIDColumn);
-        summaryScan.addColumn(ratingFamily, summaryColumn);
-
-        titleScan.addColumn(metadataFamily, titleColumn);
-        priceScan.addColumn(metadataFamily, priceColumn);
-        brandScan.addColumn(metadataFamily, brandColumn);
-
-        ResultScanner reviewScanner = reviewTable.getScanner(reviewsScan);
-        ResultScanner ratingScanner = reviewTable.getScanner(ratingScan);
-        ResultScanner reviewerIDScanner = reviewTable.getScanner(reviewerIDScan);
-        ResultScanner summaryScanner = reviewTable.getScanner(summaryScan);
-
-        ResultScanner titleScanner = metadataTable.getScanner(titleScan);
-        ResultScanner priceScanner = metadataTable.getScanner(priceScan);
-        ResultScanner brandScanner = metadataTable.getScanner(brandScan);
-
-        int nullReviewCount = 0;
-        int nullRatingCount = 0;
-        int nullReviewerIDCount = 0;
-        int nullSummaryCount = 0;
-        int nullTitleCount = 0;
-        int nullPriceCount = 0;
-        int nullBrandCount = 0;
-
-
-        for (Result result = reviewScanner.next(); result != null; result = reviewScanner.next()) {
-            String review = Bytes.toString(result.getValue(ratingFamily, reviewColumn));
-
-            if (review.equals("")) {
-                nullReviewCount += 1;
-            }
-        }
-        for (Result result = ratingScanner.next(); result != null; result = ratingScanner.next()) {
-            short rating = Bytes.toShort(result.getValue(ratingFamily, ratingColumn));
-            if (rating == 0) {
-                nullRatingCount += 1;
-            }
-        }
-        for (Result result = reviewerIDScanner.next(); result != null; result = reviewerIDScanner.next()) {
-            String reviewerID = Bytes.toString(result.getValue(ratingFamily, reviewerIDColumn));
-            if (reviewerID.equals("")) {
-                nullReviewerIDCount += 1;
-            }
-        }
-        for (Result result = summaryScanner.next(); result != null; result = summaryScanner.next()) {
-            String summary = Bytes.toString(result.getValue(metadataFamily, summaryColumn));
-            if (summary.equals("")) {
-                nullSummaryCount += 1;
-            }
-        }
-        for (Result result = titleScanner.next(); result != null; result = titleScanner.next()) {
-            String title = Bytes.toString(result.getValue(metadataFamily, titleColumn));
-
-            if (title.equals("")) {
-                nullTitleCount += 1;
-            }
-
-
-        }
-        for (Result result = priceScanner.next(); result != null; result = priceScanner.next()) {
-            double price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
-            if (price == 0) {
-                nullPriceCount += 1;
-            }
-        }
-        for (Result result = brandScanner.next(); result != null; result = brandScanner.next()) {
-            String brand = Bytes.toString(result.getValue(metadataFamily, brandColumn));
-            if (brand.equals("")) {
-                nullBrandCount += 1;
-            }
-        }
-
-        System.out.println("     Printing stats");
-        System.out.println("-------------------------");
-        System.out.println("Null Review Count: " + nullReviewCount);
-        System.out.println("Null Rating Count: " + nullRatingCount);
-        System.out.println("Null Reviewer Count: " + nullReviewerIDCount);
-        System.out.println("Null Summary Count: " + nullSummaryCount);
-        System.out.println("Null Title Count: " + nullTitleCount);
-        System.out.println("Null Price Count: " + nullPriceCount);
-        System.out.println("Null Brand Count: " + nullBrandCount);
-        System.out.println("-------------------------");
-
-    }
 
     public static void findCorrelation(Connection connection) throws IOException {
         Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
@@ -186,7 +72,7 @@ public class Main {
 
     }
 
-    public static void testNull(Connection connection) throws IOException {
+    public static void countNullValues(Connection connection) throws IOException {
         Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
         Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
 
