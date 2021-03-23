@@ -65,8 +65,8 @@ public class Main {
         ResultScanner metadataScanner = metadataTable.getScanner(metadataScan);
         ResultScanner reviewScanner = reviewTable.getScanner(reviewScan);
         double price = 0;
-        int overall = 0;
-        int count = 0;
+        double overall = 0;
+        double count = 0;
         ArrayList<Double> priceList = new ArrayList<Double>();
         ArrayList<Double> overallList = new ArrayList<Double>();
 
@@ -97,7 +97,7 @@ public class Main {
                     metadataKey = Bytes.toString(result.getRow());
                     if (previousKey.equals(metadataKey)) {
                         price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
-                        overall += Bytes.toShort(result.getValue(overallFamily, entry.getKey()));
+                        overall += Bytes.toDouble(result.getValue(overallFamily, entry.getKey()));
                         count += 1;
                         //System.out.println("Price  - " + price + " \n Overall - " + overall);
 
@@ -106,10 +106,10 @@ public class Main {
                         previousKey = metadataKey;
                         priceList.add(price);
                         System.out.println(overall + " and " +  count);
-                        overallList.add((double)overall/count);
+                        overallList.add(overall/count);
                         count = 1;
                         overall = Bytes.toShort(result.getValue(overallFamily, entry.getKey()));
-                        System.out.println("Adding price - " + price + " Overall - " + (double)overall/count);
+                        System.out.println("Adding price - " + price + " Overall - " + overall/count);
                     }
                 }
             }
