@@ -96,7 +96,7 @@ public class Main {
                 if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, entry.getKey()) != null) {
                     metadataKey = Bytes.toString(result.getRow());
                     System.out.println("Previous key - " + previousKey + " \nMetadata key - " + metadataKey);
-                    System.out.println("EQUAL?" + previousKey == metadataKey);
+                    System.out.println("EQUAL?" + previousKey.equals(metadataKey));
                     if (previousKey.equals(metadataKey)) {
                         price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
                         overall += Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
