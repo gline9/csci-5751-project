@@ -108,10 +108,10 @@ public class Main {
                         overallList.add((double) overall / count);
                         count = 1;
                         overall = Bytes.toShort(result.getValue(overallFamily, entry.getKey()));
+                        System.out.println("Adding price - " + price + " Overall - " + (double) overall / count);
                     }
                 }
             }
-            System.out.println("Adding price - " + price + " Overall - " + (double) overall / count);
 
         }
         System.out.println("Price list size - " + priceList.size() + "\n" + "Overall list size - " + overallList.size());
