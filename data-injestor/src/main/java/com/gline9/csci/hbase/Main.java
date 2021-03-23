@@ -85,6 +85,7 @@ public class Main {
 //            metadataKey = tmp[0];
             for (Map.Entry<byte[], byte[]> entry : familyMap.entrySet()) {
                 System.out.println(entry.getKey());
+                System.out.println(result.getValue(reviewFamily, entry.getKey()));
                 if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, result.getValue(reviewFamily, entry.getKey())) != null) {
                     System.out.println("We are in");
                     if (previousKey == metadataKey) {
