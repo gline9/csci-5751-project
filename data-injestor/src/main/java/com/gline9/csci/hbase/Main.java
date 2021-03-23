@@ -71,24 +71,32 @@ public class Main {
         ArrayList<Double> overallList = new ArrayList<Double>();
 
         String previousKey = "";
+        boolean flag = false;
         for (Result result : metadataScanner) {
             NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(overallFamily);
             for (Map.Entry<byte[], byte[]> entry : familyMap.entrySet()) {
                 if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, entry.getKey()) != null) {
                     previousKey = Bytes.toString(result.getRow());
+                    flag = true;
+                }
+                if(flag == true){
                     break;
                 }
+            }
+            if(flag == true){
+                break;
             }
         }
 
         for (Result result : metadataScanner) {
             NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(overallFamily);
+            String metadataKey = Bytes.toString(result.getRow());
             for (Map.Entry<byte[], byte[]> entry : familyMap.entrySet()) {
 //                System.out.println(entry.getKey());
 //                System.out.println(priceColumn);
 //                System.out.println(result.getValue(reviewFamily, entry.getKey()));
                 if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, entry.getKey()) != null) {
-                    String metadataKey = Bytes.toString(result.getRow());
+                    metadataKey = Bytes.toString(result.getRow());
                     System.out.println("Previous key - " + previousKey + " \nMetadata key - " + metadataKey);
                     if (previousKey == metadataKey) {
                         price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
