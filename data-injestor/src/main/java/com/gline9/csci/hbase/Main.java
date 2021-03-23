@@ -98,7 +98,7 @@ public class Main {
                     if (previousKey.equals(metadataKey)) {
                         price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
                         overall += (double)Bytes.toShort(result.getValue(overallFamily, entry.getKey()));
-                        count += 1;
+                        count += 1.0;
                         //System.out.println("Price  - " + price + " \n Overall - " + overall);
 
                     } else {
@@ -106,8 +106,8 @@ public class Main {
                         previousKey = metadataKey;
                         priceList.add(price);
                         System.out.println(overall + " and " +  count);
-                        overallList.add(overall/count);
-                        count = 1;
+                        overallList.add((double)overall/count);
+                        count = 1.0;
                         overall = Bytes.toShort(result.getValue(overallFamily, entry.getKey()));
                         System.out.println("Adding price - " + price + " Overall - " + (double)overall/count);
                     }
