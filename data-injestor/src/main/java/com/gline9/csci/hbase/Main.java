@@ -7,6 +7,7 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.protobuf.generated.ClientProtos;
 import org.apache.hadoop.hbase.util.Bytes;
 import java.util.ArrayList;
 import java.io.BufferedReader;
@@ -79,7 +80,8 @@ public class Main {
             String metadataKey = Bytes.toString(result.getRow());
 //            String[] tmp = metadataKey.split("-", 2);
 //            metadataKey = tmp[0];
-            System.out.println(result.getColumnCells(overallFamily,reviewerIDColumn));
+
+            System.out.println(result.getFamilyMap(overallFamily));
 //            if(result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, result.getValue(reviewFamily,reviewerIDColumn)) != null){
 //                System.out.println("We are in");
 //                if (previousKey == metadataKey) {
