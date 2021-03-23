@@ -73,15 +73,12 @@ public class Main {
         String previousKey = "";
         for (Result result : metadataScanner) {
             NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(overallFamily);
-
-            String metadataKey = Bytes.toString(result.getRow());
             for (Map.Entry<byte[], byte[]> entry : familyMap.entrySet()) {
-
                 if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, entry.getKey()) != null) {
                     previousKey = Bytes.toString(result.getRow());
+                    break;
                 }
             }
-            break;
         }
 
         for (Result result : metadataScanner) {
