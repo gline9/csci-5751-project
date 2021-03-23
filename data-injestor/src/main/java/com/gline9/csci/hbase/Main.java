@@ -158,42 +158,30 @@ public class Main {
     }
 
     public static void findRelationship(Connection connection) throws IOException {
-        Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
         Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
 
-        Scan reviewScan = new Scan();
         Scan metadataScan = new Scan();
 
-        byte[] ratingFamily = Bytes.toBytes("r");
-        byte[] ratingColumn = Bytes.toBytes("rating");
         byte[] metadataFamily = Bytes.toBytes("m");
+        byte[] overallFamily = Bytes.toBytes("o");
+
         byte[] priceColumn = Bytes.toBytes("price");
+        byte[] reviewerIDColumn = Bytes.toBytes("reviewerID");
 
-        reviewScan.addColumn(ratingFamily, ratingColumn);
-        metadataScan.addColumn(metadataFamily, priceColumn);
+        //metadataScan.addColumn(metadataFamily, priceColumn);
+        //metadataScan.addColumn(overallFamily,reviewerIDColumn);
 
-        ResultScanner reviewScanner = reviewTable.getScanner(reviewScan);
         ResultScanner metadataScanner = metadataTable.getScanner(metadataScan);
 
-
-        int check = 0;
-        for (Result result = metadataScanner.next(); result != null; result = metadataScanner.next()) {
+        for (Result result : metadataScanner) {
             String metadataKey = Bytes.toString(result.getRow());
-            double price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
-            System.out.println("MetadataKey - " + metadataKey + "\nPrice - " + price);
-            if (++check == 3) {
-                break;
+            String[] tmp = metadataKey.split("-", 2);
+            metadataKey = tmp[0];
+            if (Bytes.toDouble(result.getValue(metadataFamily, priceColumn)) != 0 && Bytes.toShort(result.getValue(overallFamily,reviewerIDColumn)) != 0){
+                double price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
+                int overall = Bytes.toShort(result.getValue(overallFamily,reviewerIDColumn));
             }
-        }
-        for (Result result = reviewScanner.next(); result != null; result = reviewScanner.next()) {
-            String reviewKey = Bytes.toString(result.getRow());
-            short rating = Bytes.toShort(result.getValue(ratingFamily, ratingColumn));
-            String[] tmp = reviewKey.split("-", 2);
-            reviewKey = tmp[0];
-            System.out.println("ReviewKEY - " + reviewKey + "\nVALUE - " + rating);
-            if (++check == 6) {
-                break;
-            }
+
         }
 
     }
@@ -232,25 +220,26 @@ public class Main {
 
         ResultScanner reviewScanner = reviewTable.getScanner(reviewScan);
         ResultScanner metadataScanner = metadataTable.getScanner(metadataScan);
+
         for (Result result : reviewScanner) {
-            if(Bytes.toShort(result.getValue(ratingFamily, ratingColumn)) == 0){
+            if(result.getValue(ratingFamily, ratingColumn) == null){
                 //System.out.println("Rating - " + Bytes.toShort(result.getValue(ratingFamily, ratingColumn)));
                 //System.out.println("Null rating count incremented.");
                 nullRatingCount += 1;
             }
-            if(Bytes.toString(result.getValue(ratingFamily, reviewColumn)) == null){
+            if(result.getValue(ratingFamily, reviewColumn) == null){
                 nullReviewCount += 1;
                 //System.out.println("Review - " + Bytes.toString(result.getValue(ratingFamily, reviewColumn)));
                 //System.out.println("Null review count incremented.");
 
             }
-            if(Bytes.toString(result.getValue(ratingFamily, reviewerIDColumn)) == null){
+            if(result.getValue(ratingFamily, reviewerIDColumn) == null){
                 nullReviewerIDCount += 1;
                 //System.out.println("ReviewerID - " + Bytes.toString(result.getValue(ratingFamily, reviewerIDColumn)));
                 //System.out.println("Null reviewerID count incremented.");
 
             }
-            if(Bytes.toString(result.getValue(ratingFamily, summaryColumn))== null){
+            if(result.getValue(ratingFamily, summaryColumn) == null){
                 nullSummaryCount += 1;
                 //System.out.println("Summary - " + Bytes.toString(result.getValue(ratingFamily, summaryColumn)));
                 //System.out.println("Null summary count incremented.");
@@ -263,26 +252,22 @@ public class Main {
         System.out.println("Null Reviewer Count: " + nullReviewerIDCount);
         System.out.println("Null Summary Count: " + nullSummaryCount);
         for(Result result : metadataScanner){
-            if(Bytes.toString(result.getValue(metadataFamily, titleColumn))== null){
+            if(result.getValue(metadataFamily, titleColumn)== null){
                 nullTitleCount += 1;
                 //System.out.println("Title - " + Bytes.toString(result.getValue(metadataFamily, titleColumn)));
                 //System.out.println("Null title count incremented.");
 
             }
-            if(Bytes.toDouble(result.getValue(metadataFamily, priceColumn)) == 0){
+            if(result.getValue(metadataFamily, priceColumn) == null){
                 nullPriceCount += 1;
                 //System.out.println("Title - " + Bytes.toString(result.getValue(metadataFamily, titleColumn)));
                 //System.out.println("Null price count incremented.");
 
             }
-            if(Bytes.toString(result.getValue(metadataFamily, brandColumn))== null){
+            if(result.getValue(metadataFamily, brandColumn)== null){
                 nullBrandCount += 1;
                 //System.out.println("Null brand count incremented.");
-
             }
-            System.out.println("Null Title Count: " + nullTitleCount);
-            System.out.println("Null Price Count: " + nullPriceCount);
-            System.out.println("Null Brand Count: " + nullBrandCount);
         }
 
 
