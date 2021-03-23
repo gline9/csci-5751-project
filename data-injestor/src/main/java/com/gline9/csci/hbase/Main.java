@@ -81,7 +81,7 @@ public class Main {
 //            String[] tmp = metadataKey.split("-", 2);
 //            metadataKey = tmp[0];
 
-            System.out.println(result.getFamilyMap(overallFamily));
+            System.out.println(result.getFamilyMap(overallFamily).get(reviewerIDColumn));
 //            if(result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, result.getValue(reviewFamily,reviewerIDColumn)) != null){
 //                System.out.println("We are in");
 //                if (previousKey == metadataKey) {
