@@ -84,6 +84,7 @@ public class Main {
 //            String[] tmp = metadataKey.split("-", 2);
 //            metadataKey = tmp[0];
             for (Map.Entry<byte[], byte[]> entry : familyMap.entrySet()) {
+                System.out.println(entry.getKey());
                 if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, result.getValue(reviewFamily, entry.getKey())) != null) {
                     System.out.println("We are in");
                     if (previousKey == metadataKey) {
@@ -102,10 +103,9 @@ public class Main {
                     count += 1;
                 }
             }
-            System.out.println("Price list size - " + priceList.size() + "\n" + "Overall list size - " + overallList.size());
-
-
         }
+        System.out.println("Price list size - " + priceList.size() + "\n" + "Overall list size - " + overallList.size());
+
     }
 
 
