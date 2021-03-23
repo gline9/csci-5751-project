@@ -65,11 +65,11 @@ public class Main {
         ArrayList<Double> overallList = new ArrayList<Double>();
 
         String previousKey = "";
-        for(Result result: metadataScanner){
-            previousKey = Bytes.toString(result.getRow());
-            System.out.println("Previous key first assigned as " + previousKey);
-            break;
-        }
+//        for(Result result: metadataScanner){
+//            previousKey = Bytes.toString(result.getRow());
+//            System.out.println("Previous key first assigned as " + previousKey);
+//            break;
+//        }
 
         for (Result result : metadataScanner) {
             String metadataKey = Bytes.toString(result.getRow());
