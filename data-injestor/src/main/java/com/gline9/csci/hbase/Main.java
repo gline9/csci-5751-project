@@ -107,9 +107,10 @@ public class Main {
                         priceList.add(price);
                         System.out.println(overall + " and " +  count);
                         overallList.add((double)overall/count);
+                        System.out.println("Adding price - " + price + " Overall - " + (double)overall/count);
                         count = 1.0;
                         overall = Bytes.toShort(result.getValue(overallFamily, entry.getKey()));
-                        System.out.println("Adding price - " + price + " Overall - " + (double)overall/count);
+                        price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
                     }
                 }
             }
