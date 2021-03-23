@@ -84,31 +84,31 @@ public class Main {
 //            String[] tmp = metadataKey.split("-", 2);
 //            metadataKey = tmp[0];
             for (Map.Entry<byte[], byte[]> entry : familyMap.entrySet()) {
-                String sid = new String(entry.getKey(), StandardCharsets.UTF_8);
-                System.out.println(sid);
+                if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, result.getValue(reviewFamily, entry.getKey())) != null) {
+                    System.out.println("We are in");
+                    if (previousKey == metadataKey) {
+                        price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
+                        overall += Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
+                        System.out.println("Price  - " + price + " \n Overall - " + " overall");
+
+                    } else if (previousKey != metadataKey) {
+                        System.out.println("Adding price - " + price + " Overall - " + (double) overall / count);
+                        previousKey = metadataKey;
+                        priceList.add(price);
+                        overallList.add((double) overall / count);
+                        count = 1;
+                        overall = Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
+                    }
+                    count += 1;
+                }
             }
+            System.out.println("Price list size - " + priceList.size() + "\n" + "Overall list size - " + overallList.size());
 
-//            if(result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, result.getValue(reviewFamily,reviewerIDColumn)) != null){
-//                System.out.println("We are in");
-//                if (previousKey == metadataKey) {
-//                    price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
-//                    overall += Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
-//                    System.out.println("Price  - " + price + " \n Overall - " + " overall");
-//
-//                } else if (previousKey != metadataKey) {
-//                    System.out.println("Adding price - " + price + " Overall - " + (double)overall/count);
-//                    previousKey = metadataKey;
-//                    priceList.add(price);
-//                    overallList.add((double) overall / count);
-//                    count = 1;
-//                    overall = Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
-//                }
-//                count += 1;
-//            }
+
         }
-//        System.out.println("Price list size - " + priceList.size() + "\n" + "Overall list size - " + overallList.size());
-
     }
+
+
 
     public static void countNullValues(Connection connection) throws IOException {
         Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
