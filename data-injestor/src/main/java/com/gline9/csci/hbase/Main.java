@@ -89,9 +89,11 @@ public class Main {
 //                System.out.println(result.getValue(reviewFamily, entry.getKey()));
                 if (result.getValue(metadataFamily, priceColumn) != null && result.getValue(overallFamily, entry.getKey()) != null) {
                     System.out.println("We are in");
+                    System.out.println("Previous key - " + previousKey + " \n Metadata key - " + metadataKey);
                     if (previousKey == metadataKey) {
                         price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
                         overall += Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
+                        count += 1;
                         System.out.println("Price  - " + price + " \n Overall - " + " overall");
 
                     } else if (previousKey != metadataKey) {
@@ -102,7 +104,6 @@ public class Main {
                         count = 1;
                         overall = Bytes.toShort(result.getValue(overallFamily, reviewerIDColumn));
                     }
-                    count += 1;
                 }
             }
         }
