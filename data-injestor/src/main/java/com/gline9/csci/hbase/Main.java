@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.NavigableMap;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -60,9 +61,8 @@ public class Main {
         ResultScanner priceScan = metadataTable.getScanner(scan);
 
         for (Result result = priceScan.next(); result != null; result = priceScan.next()) {
-            double price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
-            String title = Bytes.toString(result.getValue(metadataFamily, titleColumn));
-            System.out.println(title + " " + price);
+            NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(metadataFamily);
+            System.out.println(familyMap);
         }
     }
 
