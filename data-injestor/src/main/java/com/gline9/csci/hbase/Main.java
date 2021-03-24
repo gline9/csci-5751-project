@@ -25,40 +25,8 @@ public class Main {
 
         Configuration configuration = HBaseConfiguration.create();
         try (Connection connection = ConnectionFactory.createConnection(configuration)) {
-            //countNullValues(connection);
-            //findCorrelation(connection);
-            //findRelationship(connection);
-            ArrayList<Double> l1 = new ArrayList<Double>();
-            ArrayList<Double> l2 = new ArrayList<Double>();
-            l1.add(1.0);
-            l2.add(2.0);
-            l1.add(3.0);
-            l2.add(4.0);
-            l1.add(5.0);
-            l2.add(6.0);
-            l1.add(7.0);
-            l2.add(8.0);
-            l1.add(9.0);
-            l2.add(10.0);
-            l1.add(11.0);
-            l2.add(12.0);
-            writeTotxtFile(l1,l2);
-        }
-    }
-
-
-    public static void findCorrelation(Connection connection) throws IOException {
-        Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
-        //Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
-        Scan ratingScanner = new Scan();
-        byte[] ratingFamily = Bytes.toBytes("r");
-        byte[] ratingColumn = Bytes.toBytes("rating");
-        ResultScanner ratingScan = reviewTable.getScanner(ratingScanner);
-        for (Result result = ratingScan.next(); result != null; result = ratingScan.next()) {
-            short rating = Bytes.toShort(result.getValue(ratingFamily, ratingColumn));
-
-            System.out.println("Result: " + result);
-            System.out.println("Rating - " + rating);
+            countNullValues(connection);
+            findRelationship(connection);
         }
     }
 
@@ -124,6 +92,7 @@ public class Main {
                 }
             }
         }
+        writeTotxtFile(priceList, overallList);
     }
     public static void writeTotxtFile(ArrayList<Double> l1, ArrayList<Double> l2) throws IOException {
         try {
