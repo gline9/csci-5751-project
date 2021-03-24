@@ -25,11 +25,37 @@ public class Main {
 
         Configuration configuration = HBaseConfiguration.create();
         try (Connection connection = ConnectionFactory.createConnection(configuration)) {
-            countNullValues(connection);
-            findRelationship(connection);
+            //countNullValues(connection);
+            //findRelationship(connection);
+            checkOverall(connection);
         }
     }
+    public static void checkOverall(Connection connection) throws IOException {
+        Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
+        Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
 
+        Scan metadataScan = new Scan();
+        Scan reviewScan = new Scan();
+        byte[] metadataFamily = Bytes.toBytes("m");
+        byte[] overallFamily = Bytes.toBytes("o");
+
+
+        ResultScanner metadataScanner = metadataTable.getScanner(metadataScan);
+
+        //metadataScanner = metadataTable.getScanner(metadataScan);
+
+        for (Result result : metadataScanner) {
+            NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(overallFamily);
+            for (Map.Entry<byte[], byte[]> entry : familyMap.entrySet()) {
+                if (result.getValue(overallFamily, entry.getKey()) != null) {
+                    if(Bytes.toShort(result.getValue(overallFamily, entry.getKey())) < 0){
+                        System.out.println("There is overall value that is less than 0.");
+                    }
+
+                }
+            }
+        }
+    }
     public static void findRelationship(Connection connection) throws IOException {
         Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
         Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
