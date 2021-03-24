@@ -29,8 +29,8 @@ public class Main {
             //countNullValues(connection);
             //findCorrelation(connection);
             //findRelationship(connection);
-            ArrayList<Double> l1 = new ArrayList<>();
-            ArrayList<Double> l2 = new ArrayList<>();
+            ArrayList<Double> l1 = new ArrayList<Double>();
+            ArrayList<Double> l2 = new ArrayList<Double>();
             l1.add(1.0);
             l2.add(2.0);
             l1.add(3.0);
