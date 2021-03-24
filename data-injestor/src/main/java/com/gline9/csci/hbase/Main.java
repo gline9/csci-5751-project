@@ -59,8 +59,8 @@ public class Main {
 
         for (Result result = priceScan.next(); result != null; result = priceScan.next()) {
             NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(metadataFamily);
-            if (Bytes.toDouble(familyMap.get(priceColumn)) > 100000) {
-                System.out.println(Bytes.toString(familyMap.get(titleColumn)) 
+            if (familyMap.get(priceColumn) != null && Bytes.toDouble(familyMap.get(priceColumn)) > 100000) {
+                System.out.println(Bytes.toString(familyMap.get(titleColumn))
                         + " " + Bytes.toDouble(familyMap.get(priceColumn)));
             }
         }
