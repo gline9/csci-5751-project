@@ -10,6 +10,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -32,6 +33,35 @@ public class Main {
                 case "8":
                     writeReviewSample(connection, Double.parseDouble(args[1]));
                     break;
+                case "ignore":
+                    // this code is not used for a specific question
+                    findItem(connection);
+                    break;
+            }
+        }
+    }
+
+    public static void findItem(Connection connection) throws IOException {
+
+        Table metadataTable = connection.getTable(TableName.valueOf("metadata"));
+
+        Scan scan = new Scan();
+
+        byte[] metadataFamily = Bytes.toBytes("m");
+
+        byte[] priceColumn = Bytes.toBytes("price");
+
+        byte[] titleColumn = Bytes.toBytes("title");
+
+        scan.addFamily(metadataFamily);
+
+        ResultScanner priceScan = metadataTable.getScanner(scan);
+
+        for (Result result = priceScan.next(); result != null; result = priceScan.next()) {
+            double price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
+            if (price > 100000) {
+                String title = Bytes.toString(result.getValue(metadataFamily, titleColumn));
+                System.out.println(title + " " + price);
             }
         }
     }
