@@ -129,7 +129,7 @@ public class Main {
     public static void writeTotxtFile(ArrayList<Double> l1, ArrayList<Double> l2) throws IOException {
         FileWriter myWriter = new FileWriter("filename.txt");
         for(int i = 0; i < l1.size(); i++){
-            myWriter.write(String.format("%s,%s", l1.get(i),l2.get(i)));
+            myWriter.write(String.format("%f,%f", l1.get(i),l2.get(i)));
         }
     }
     public static void countNullValues(Connection connection) throws IOException {
