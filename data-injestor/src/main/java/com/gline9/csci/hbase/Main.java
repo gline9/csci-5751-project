@@ -145,9 +145,9 @@ public class Main {
             double tmp = Bytes.toDouble(result.getValue(metadataFamily, metadataColumn));
 
             //print weirdly high priced item title
-            if (tmp > 10000000) {
-                System.out.println("Item > 10000000:");
-                System.out.println(Bytes.toString(result.getValue(metadataFamily, titleColumn)));
+            if (tmp > 1000000) {
+                System.out.println("Item > 1000000:");
+                System.out.println(tmp + " " + Bytes.toString(result.getValue(metadataFamily, titleColumn)));
             }
             if (tmp > priceMax) {
                 priceMax = tmp;
