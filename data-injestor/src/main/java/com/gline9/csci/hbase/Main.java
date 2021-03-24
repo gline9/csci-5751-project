@@ -124,7 +124,11 @@ public class Main {
 
         byte[] metadataColumn = Bytes.toBytes("price");
 
+        byte[] titleColumn = Bytes.toBytes("title");
+
         scan.addColumn(metadataFamily, metadataColumn);
+
+        scan.addColumn(metadataFamily, titleColumn);
 
         ResultScanner priceScan = metadataTable.getScanner(scan);
 
@@ -140,6 +144,11 @@ public class Main {
         for (Result result = priceScan.next(); result != null; result = priceScan.next()) {
             double tmp = Bytes.toDouble(result.getValue(metadataFamily, metadataColumn));
 
+            //print weirdly high priced item title
+            if (tmp > 10000000) {
+                System.out.println("Item > 10000000:");
+                System.out.println(Bytes.toString(result.getValue(metadataFamily, titleColumn)));
+            }
             if (tmp > priceMax) {
                 priceMax = tmp;
             }
