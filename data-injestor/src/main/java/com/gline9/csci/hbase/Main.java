@@ -1,11 +1,10 @@
 package com.gline9.csci.hbase;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.Cell;
-import org.apache.hadoop.hbase.CellUtil;
-import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
-import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.filter.CompareFilter;
+import org.apache.hadoop.hbase.filter.SingleColumnValueFilter;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.FileWriter;
@@ -55,14 +54,15 @@ public class Main {
 
         scan.addFamily(metadataFamily);
 
+        SingleColumnValueFilter filter = new SingleColumnValueFilter(metadataFamily,priceColumn,CompareOperator.GREATER, Bytes.toBytes(100000));
+        scan.setFilter(filter);
+
         ResultScanner priceScan = metadataTable.getScanner(scan);
 
         for (Result result = priceScan.next(); result != null; result = priceScan.next()) {
             double price = Bytes.toDouble(result.getValue(metadataFamily, priceColumn));
-            if (price > 100000) {
-                String title = Bytes.toString(result.getValue(metadataFamily, titleColumn));
-                System.out.println(title + " " + price);
-            }
+            String title = Bytes.toString(result.getValue(metadataFamily, titleColumn));
+            System.out.println(title + " " + price);
         }
     }
 
