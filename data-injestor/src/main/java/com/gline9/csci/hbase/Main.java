@@ -126,10 +126,8 @@ public class Main {
 
         byte[] titleColumn = Bytes.toBytes("title");
 
-        scan.addColumn(metadataFamily, metadataColumn);
-
-        scan.addColumn(metadataFamily, titleColumn);
-
+        scan.addFamily(metadataFamily);
+        
         ResultScanner priceScan = metadataTable.getScanner(scan);
 
         // assuming minPrice is less than 100.00
