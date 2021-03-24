@@ -1,10 +1,14 @@
 package com.gline9.csci.hbase;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import org.apache.hadoop.hbase.client.Delete;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +21,7 @@ public class MetadataEntry
     private String brand;
     private String title;
     private List<String> category;
+    private List<String> feature;
     private List<String> also_view;
     private List<String> also_buy;
 
@@ -56,6 +61,27 @@ public class MetadataEntry
         }
     }
 
+    public Optional<Delete> toCategoryDelete()
+    {
+        Set<String> toDelete = new HashSet<>(category);
+        toDelete.retainAll(feature);
+
+        if (toDelete.isEmpty())
+        {
+            return Optional.empty();
+        }
+
+        Delete delete = new Delete(Bytes.toBytes(asin));
+        byte[] categoryFamily = Bytes.toBytes("c");
+
+        for (String deletion : toDelete)
+        {
+            delete.addColumns(categoryFamily, Bytes.toBytes(deletion));
+        }
+
+        return Optional.of(delete);
+    }
+
     public Double getPrice()
     {
         if (null == price || price.trim().isEmpty())
@@ -93,4 +119,10 @@ public class MetadataEntry
     {
         return String.format("ASIN: '%s', Price: '%.2f', Brand: '%s', Categories: '%d', Also Viewed: '%d', Also Bought: '%d'", asin, getPrice(), brand, category.size(), also_view.size(), also_buy.size());
     }
+
+    public String getAsin()
+    {
+        return asin;
+    }
+
 }
