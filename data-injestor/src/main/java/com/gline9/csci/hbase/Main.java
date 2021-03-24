@@ -11,7 +11,6 @@ import org.apache.hadoop.hbase.protobuf.generated.ClientProtos;
 import org.apache.hadoop.hbase.util.Bytes;
 import java.io.FileWriter;
 import javax.swing.*;
-import org.math.plot.*;
 import java.awt.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
