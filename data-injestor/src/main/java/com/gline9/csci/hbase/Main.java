@@ -126,10 +126,35 @@ public class Main {
         }
     }
     public static void writeTotxtFile(ArrayList<Double> l1, ArrayList<Double> l2) throws IOException {
-        FileWriter myWriter = new FileWriter("filename.txt");
-        for(int i = 0; i < l1.size(); i++){
-            myWriter.write(String.format("%f,%f", l1.get(i),l2.get(i)));
+        try {
+            File file = new File("filename.txt");
+            FileWriter fileWriter = new FileWriter("filename.txt");
+            if (file.createNewFile()) {
+                System.out.println("File created: " + file.getName());
+                for(int i = 0; i < l1.size(); i++){
+                    fileWriter.write(l1.get(i).toString());
+                    fileWriter.write(",");
+                    fileWriter.write(l2.get(i).toString());
+                    fileWriter.write("\n");
+                }
+                fileWriter.close();
+            }
+
+            else {
+                System.out.println("File already exists.");
+                for(int i = 0; i < l1.size(); i++){
+                    fileWriter.write(l1.get(i).toString());
+                    fileWriter.write(",");
+                    fileWriter.write(l2.get(i).toString());
+                    fileWriter.write("\n");
+                }
+                fileWriter.close();
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
         }
+
     }
     public static void countNullValues(Connection connection) throws IOException {
         Table reviewTable = connection.getTable(TableName.valueOf("reviews"));
