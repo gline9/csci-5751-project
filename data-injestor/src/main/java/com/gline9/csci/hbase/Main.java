@@ -55,14 +55,14 @@ public class Main {
 
         scan.addFamily(metadataFamily);
 
-        SingleColumnValueFilter filter = new SingleColumnValueFilter(metadataFamily,priceColumn,CompareOperator.GREATER, Bytes.toBytes(100000));
-        scan.setFilter(filter);
-
         ResultScanner priceScan = metadataTable.getScanner(scan);
 
         for (Result result = priceScan.next(); result != null; result = priceScan.next()) {
             NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(metadataFamily);
-            System.out.println(familyMap);
+            if (Bytes.toDouble(familyMap.get(priceColumn)) > 100000) {
+                System.out.println(Bytes.toString(familyMap.get(titleColumn)) 
+                        + " " + Bytes.toDouble(familyMap.get(priceColumn)));
+            }
         }
     }
 
