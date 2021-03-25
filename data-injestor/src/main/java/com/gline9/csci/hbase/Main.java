@@ -25,8 +25,8 @@ public class Main {
 
         Configuration configuration = HBaseConfiguration.create();
         try (Connection connection = ConnectionFactory.createConnection(configuration)) {
-            countNullValues(connection);
-            //findRelationship(connection);
+            //countNullValues(connection);
+            findRelationship(connection);
             //checkOverall(connection);
         }
     }
@@ -122,7 +122,7 @@ public class Main {
     public static void writeTotxtFile(ArrayList<Double> l1, ArrayList<Double> l2) throws IOException {
         try {
             File file = new File("priceversusoverall.txt");
-            FileWriter fileWriter = new FileWriter("filename.txt");
+            FileWriter fileWriter = new FileWriter("priceversusoverall.txt");
             if (file.createNewFile()) {
                 System.out.println("File created: " + file.getName());
                 for(int i = 0; i < l1.size(); i++){
