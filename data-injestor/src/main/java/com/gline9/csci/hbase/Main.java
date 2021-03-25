@@ -25,9 +25,9 @@ public class Main {
 
         Configuration configuration = HBaseConfiguration.create();
         try (Connection connection = ConnectionFactory.createConnection(configuration)) {
-            //countNullValues(connection);
+            countNullValues(connection);
             //findRelationship(connection);
-            checkOverall(connection);
+            //checkOverall(connection);
         }
     }
     public static void checkOverall(Connection connection) throws IOException {
@@ -73,7 +73,7 @@ public class Main {
         ResultScanner metadataScanner = metadataTable.getScanner(metadataScan);
         ResultScanner reviewScanner = reviewTable.getScanner(reviewScan);
         double price = 0;
-        short overall = 0;
+        int overall = 0;
         double count = 0;
         ArrayList<Double> priceList = new ArrayList<Double>();
         ArrayList<Double> overallList = new ArrayList<Double>();
@@ -95,7 +95,6 @@ public class Main {
                 break;
             }
         }
-        metadataScanner = metadataTable.getScanner(metadataScan);
 
         for (Result result : metadataScanner) {
             NavigableMap<byte[], byte[]> familyMap = result.getFamilyMap(overallFamily);
@@ -122,7 +121,7 @@ public class Main {
     }
     public static void writeTotxtFile(ArrayList<Double> l1, ArrayList<Double> l2) throws IOException {
         try {
-            File file = new File("filename.txt");
+            File file = new File("priceversusoverall.txt");
             FileWriter fileWriter = new FileWriter("filename.txt");
             if (file.createNewFile()) {
                 System.out.println("File created: " + file.getName());
